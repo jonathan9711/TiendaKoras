@@ -19,4 +19,5 @@ class vistaController extends Controller
         $categorias = categorias::all();
         return view('tienda.contactanos',compact('categorias'));
     }
+
 }

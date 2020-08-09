@@ -33,7 +33,7 @@
 						<span class="caption2-slide1 m-text1 t-center animated visible-false m-b-33" data-appear="fadeInDown">
 							Botas, Cintos y Sombreros
 						</span>
-
+						
 						<div class="wrap-btn-slide1 w-size1 animated visible-false" data-appear="zoomIn">
 							
 							<a href="{{url('/productos')}}" class="flex-c-m size2 bo-rad-23 s-text2 bgwhite hov1 trans-0-4">
@@ -94,17 +94,27 @@
 			<div class="tab01">
 				<!-- Nav tabs -->
 				<ul class="nav nav-tabs" role="tablist">
-					<li class="nav-item">
-						<a class="category_item active" data-toggle="tab" href="#" category="todo">Mostar todo</a>
-					</li>
+					
 					<!-- <li class="nav-item">
 						<a class="nav-link" data-toggle="tab" href="#featured" role="tab">Featured</a>
 					</li> -->
+					@if($categoriaProducto!='')
+						@foreach($categoriaProducto as $categoria)
+						<li class="nav-item">
+							<a class="category_item" data-toggle="tab" href="#" category="{{$categoria->id}}">{{$categoria->categoria}}</a>
+						</li>
+						@endforeach
+					@else
+					<li class="nav-item">
+						<a class="category_item active" data-toggle="tab" href="#" category="todo">Mostar todo</a>
+					</li>
 					@foreach($categorias as $categoria)
 					<li class="nav-item">
 						<a class="category_item" data-toggle="tab" href="#" category="{{$categoria->id}}">{{$categoria->categoria}}</a>
 					</li>
 					@endforeach
+					@endif
+
 					<!-- <li class="nav-item">
 						<a class="nav-link" data-toggle="tab" href="#sale" role="tab">Sale</a>
 					</li>
@@ -145,7 +155,7 @@
 										<a href="{{url('producto/'.$producto->id_producto.'/detalle')}}" class="block2-name dis-block s-text3 p-b-5">
 											{{$producto->nombre}}
 										</a>
-										<p class="block2-name dis-block s-text3 p-b-5">
+										<p class="dis-block s-text3 p-b-5">
 											{{$producto->descripcion}}
                                     	</p>
 

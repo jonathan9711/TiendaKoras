@@ -10,11 +10,15 @@ class productoController extends Controller
 {
     public function index()
     {
+        $categoriaProducto="";
         $categorias = categorias::all();
         $productos = producto::all();
-        return view('tienda.index',compact('productos','categorias'));
+        return view('tienda.index',compact('productos','categorias','categoriaProducto'));
     }
-
+    public function vistaproducto()
+    {
+        return view('admin.productos');
+    }
 
     public function informacion($id)
     {
@@ -42,8 +46,14 @@ class productoController extends Controller
 
     public function productoCategoria($id)
     {
+        $idcategoria;
         $categorias = categorias::all();
         $productos = producto::where('id_categoria','=',$id)->get();
-        return view('tienda.index',compact('productos','categorias'));
+        foreach($productos as $prod){
+            $idcategoria=$prod->id_categoria;
+        }
+        $categoriaProducto= categorias::where('id','=',$idcategoria)->get();
+
+        return view('tienda.index',compact('productos','categorias','categoriaProducto'));
     }
 }

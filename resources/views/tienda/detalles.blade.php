@@ -33,6 +33,7 @@
                         <div class="p-t-33 p-b-60">
 
                             <div class="flex-m flex-w p-b-10">
+                           
                                 <div class="s-text15 w-size15 t-center">
                                     Opciones para tallas
                                 </div>
@@ -44,13 +45,14 @@
                                             
                                             @if($categoria->categoria=="Botas para caballero" ||$categoria->categoria=="Botas para Caballero" || $categoria->categoria=="Botas para Damas" ||$categoria->categoria=="Botas para damas"
                                             || $categoria->categoria=="Botas para Niños" ||$categoria->categoria=="Botas para niños")
-                                                <option value="MXN_calzado">MXN</option>
-                                                <option value="USA_calzado">USA</option>
-                                           
+                                                <option value="MXN_sombrero">MXN Sombreros, Gorras</option>
+                                                <option value="USA_sombrero">USA Sombreros, Gorras</option>
+
                                             @elseif($categoria->categoria=="Sombreros" || $categoria->categoria=="sombreros" || $categoria->categoria=="Texanas" || $categoria->categoria=="texanas"
                                             || $categoria->categoria=="Gorras" || $categoria->categoria=="gorras")
                                                 <option value="MXN_sombrero">MXN Sombreros, Gorras</option>
                                                 <option value="USA_sombrero">USA Sombreros, Gorras</option>
+
                                             @elseif($categoria->categoria!="Sombreros" && $categoria->categoria!="sombreros" && $categoria->categoria!="Texanas" && $categoria->categoria!="texanas"
                                             && $categoria->categoria!="Gorras" && $categoria->categoria!="gorras")
                                                 <option value="MXN">MXN</option>
@@ -147,31 +149,7 @@
                                             </select>
                                         </div>
                                     </div>
-                                     <!--colores para sombreros  -->
-                                    <div class="flex-m flex-w">
-                                        <div class="s-text15 w-size15 t-center">
-                                            Color
-                                        </div>
-                                        
-
-                                        <div class="rs2-select2 rs3-select2 bo4 of-hidden w-size16">
-                                            <select class="selection-2" name="color">
-                                                <option value="">Elija una Opción</option>
-                                                <option value="Tabaco">Tabaco</option>
-                                                <option value="Negro">Negro</option>
-                                                <option value="Beige">Beige</option>
-                                                <option value="Gris">Gris</option>
-                                                <option value="Rojo">Rojo</option>
-                                                <option value="Camel">Camel</option>
-                                                <option value="Cafe Chocolate">Cafe Chocolate</option>
-                                                <option value="Vino">Vino</option>
-                                                <option value="Verde Militar">Verde Militar</option>
-                                                <option value="Amarillo">Amarillo</option>
-                                                <option value="Azul Marino">Azul Marino</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
+                               
                                 @endif
                             @endforeach
 

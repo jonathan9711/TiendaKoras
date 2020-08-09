@@ -7,7 +7,7 @@
 <!--===============================================================================================-->
 	<link rel="icon" type="image/png" href="{{asset('images/icons/favicon.png')}}"/>
 <!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="{{asset('vendor/bootstrap/css/bootstrap.min.css')}}">
+	<link rel="stylesheet" type="text/css" href="vendor/bootstrap/css/bootstrap.min.css">
 <!--===============================================================================================-->
 	<link rel="stylesheet" type="text/css" href="{{asset('fonts/font-awesome-4.7.0/css/font-awesome.min.css')}}">
 <!--===============================================================================================-->
@@ -17,19 +17,19 @@
 <!--===============================================================================================-->
 	<link rel="stylesheet" type="text/css" href="{{asset('fonts/elegant-font/html-css/style.css')}}">
 <!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="{{asset('vendor/animate/animate.css')}}">
+	<link rel="stylesheet" type="text/css" href="vendor/animate/animate.css">
 <!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="{{asset('vendor/css-hamburgers/hamburgers.min.css')}}">
+	<link rel="stylesheet" type="text/css" href="vendor/css-hamburgers/hamburgers.min.css">
 <!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="{{asset('vendor/animsition/css/animsition.min.css')}}">
+	<link rel="stylesheet" type="text/css" href="vendor/animsition/css/animsition.min.css">
 <!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="{{asset('vendor/select2/select2.min.css')}}">
+	<link rel="stylesheet" type="text/css" href="vendor/select2/select2.min.css">
 <!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="{{asset('vendor/daterangepicker/daterangepicker.css')}}">
+	<link rel="stylesheet" type="text/css" href="vendor/daterangepicker/daterangepicker.css">
 <!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="{{asset('vendor/slick/slick.css')}}">
-<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="{{asset('vendor/lightbox2/css/lightbox.min.css')}}">
+	<link rel="stylesheet" type="text/css" href="vendor/slick/slick.css">
+<!--====================================================================}===========================-->
+	<link rel="stylesheet" type="text/css" href="vendor/lightbox2/css/lightbox.min.css">
 <!--===============================================================================================-->
 	<link rel="stylesheet" type="text/css" href="{{asset('css/util.css')}}">
 	<link rel="stylesheet" type="text/css" href="{{asset('css/main.css')}}">
@@ -38,7 +38,7 @@
 
 </head>
 <body class="animsition">
-
+	
 	<!-- header fixed -->
 	<div class="wrap_header fixed-header2 trans-0-4">
 		<!-- Logo -->
@@ -66,7 +66,7 @@
 				</li>
 
 				<li>
-					<a href="product.html">Registrarse</a>
+					<a href="{{url('/registrarse')}}">Registrarse</a>
 				</li>
 
 				<li>
@@ -87,10 +87,19 @@
 					<nav class="menu">
 						<ul class="main_menu">
 							<li>
-								<a href="index.html"><i class="topbar-social-item fa fa-user"></i> mi cuenta</a>
+								@if(session()->get('cliente')=='')
+									<a href="{{url('/ingresar')}}"><i class="topbar-social-item fa fa-user"></i> Mi Cuenta</a>
+									
+								@else
+									<a href="index.html"><i class="topbar-social-item fa fa-user"></i> {{session()->get('cliente')->nombre}}</a>
+								@endif										
 								<ul class="sub_menu">
-									<li><a href="index.html">Ingresar</a></li>
-									<li><a href="home-02.html">Registrarse</a></li>
+									@if(session()->get('cliente')=='')
+										<li><a href="{{url('/ingresar')}}">Ingresar</a></li>
+										<li><a href="{{url('/registrarse')}}">Registrarse</a></li>
+									@else
+										<li><a href="{{url('/CerrarSesion')}}">Cerrar Sesión</a></li>
+									@endif
 								</ul>
 							</li>
 						</ul>
@@ -210,7 +219,7 @@
 							</li>
 
 							<li>
-								<a href="product.html">Registrarse</a>
+								<a href="{{url('/registrarse')}}">Registrarse</a>
 							</li>
 
 							<li>
@@ -239,10 +248,19 @@
 							<nav class="menu">
 								<ul class="main_menu">
 									<li>
-										<a href="index.html"><i class="topbar-social-item fa fa-user"></i> mi cuenta</a>
-										<ul class="sub_menu">
-											<li><a href="index.html">Ingresar</a></li>
-											<li><a href="home-02.html">Registrarse</a></li>
+											@if(session()->get('cliente')=='')
+												<a href="{{url('/ingresar')}}"><i class="topbar-social-item fa fa-user"></i> Mi Cuenta</a>
+											
+											@else
+												<a href="index.html"><i class="topbar-social-item fa fa-user"></i> {{session()->get('cliente')->nombre}}</a>
+											@endif										
+											<ul class="sub_menu">
+											@if(session()->get('cliente')=='')
+												<li><a href="{{url('/ingresar')}}">Ingresar</a></li>
+												<li><a href="{{url('/registrarse')}}">Registrarse</a></li>
+											@else
+												<li><a href="{{url('/CerrarSesion')}}">Cerrar Sesión</a></li>
+											@endif
 										</ul>
 									</li>
 								</ul>
@@ -350,10 +368,19 @@
 							<nav class="menu">
 								<ul class="main_menu">
 									<li>
-										<a href="index.html"><i class="topbar-social-item fa fa-user"></i> mi cuenta</a>
-										<ul class="sub_menu">
-											<li><a href="index.html">Ingresar</a></li>
-											<li><a href="home-02.html">Registrarse</a></li>
+											@if(session()->get('cliente')=='')
+												<a href="{{url('/ingresar')}}"><i class="topbar-social-item fa fa-user"></i> Mi Cuenta</a>
+											
+											@else
+												<a href="index.html"><i class="topbar-social-item fa fa-user"></i> {{session()->get('cliente')->nombre}}</a>
+											@endif										
+											<ul class="sub_menu">
+											@if(session()->get('cliente')=='')
+												<li><a href="{{url('/ingresar')}}">Ingresar</a></li>
+												<li><a href="{{url('/registrarse')}}">Registrarse</a></li>
+											@else
+												<li><a href="{{url('/CerrarSesion')}}">Cerrar Sesión</a></li>
+											@endif
 										</ul>
 									</li>
 								</ul>
@@ -490,7 +517,7 @@
 					</li>
 
 					<li class="item-menu-mobile">
-						<a href="product.html">Registrarse</a>
+						<a href="{{url('/registrarse')}}">Registrarse</a>
 					</li>
 
 					<li class="item-menu-mobile">
@@ -504,7 +531,7 @@
 			</nav>
 		</div>
 	</header>
-
+	<button onclick="alerta()">click</button>
 	@yield('contenido')
 	
 
@@ -618,14 +645,14 @@
 	</footer>
 
 	<!--===============================================================================================-->
-    <script type="text/javascript" src="{{asset('vendor/jquery/jquery-3.2.1.min.js')}}"></script>
+    <script type="text/javascript" src="vendor/jquery/jquery-3.2.1.min.js"></script>
 <!--===============================================================================================-->
-	<script type="text/javascript" src="{{asset('vendor/animsition/js/animsition.min.js')}}"></script>
+	<script type="text/javascript" src="vendor/animsition/js/animsition.min.js"></script>
 <!--===============================================================================================-->
-	<script type="text/javascript" src="{{asset('vendor/bootstrap/js/popper.js')}}"></script>
-	<script type="text/javascript" src="{{asset('vendor/bootstrap/js/bootstrap.min.js')}}"></script>
+	<script type="text/javascript" src="vendor/bootstrap/js/popper.js"></script>
+	<script type="text/javascript" src="vendor/bootstrap/js/bootstrap.min.js"></script>
 <!--===============================================================================================-->
-	<script type="text/javascript" src="{{asset('vendor/select2/select2.min.js')}}"></script>
+	<script type="text/javascript" src="vendor/select2/select2.min.js"></script>
 	<script type="text/javascript">
 		$(".selection-1").select2({
 			minimumResultsForSearch: 20,
@@ -637,15 +664,15 @@
 		});
 	</script>
 <!--===============================================================================================-->
-	<script type="text/javascript" src="{{asset('vendor/slick/slick.min.js')}}"></script>
+	<script type="text/javascript" src="vendor/slick/slick.min.js"></script>
 
 	<script type="text/javascript" src="{{asset('js/slick-custom.js')}}"></script>
 <!--===============================================================================================-->
-	<script type="text/javascript" src="{{asset('vendor/countdowntime/countdowntime.js')}}"></script>
+	<script type="text/javascript" src="vendor/countdowntime/countdowntime.js"></script>
 <!--===============================================================================================-->
-	<script type="text/javascript" src="{{asset('vendor/lightbox2/js/lightbox.min.js')}}"></script>
+	<script type="text/javascript" src="vendor/lightbox2/js/lightbox.min.js"></script>
 <!--===============================================================================================-->
-	<script type="text/javascript" src="{{asset('vendor/sweetalert/sweetalert.min.js')}}"></script>
+	<script type="text/javascript" src="vendor/sweetalert/sweetalert.min.js"></script>
 
 	<script type="text/javascript">
 		$('.block2-btn-addcart').each(function(){
@@ -667,7 +694,7 @@
 
 	<script src="{{asset('js/map-custom.js')}}"></script>
 <!--===============================================================================================-->
-	<script type="text/javascript" src="{{asset('vendor/parallax100/parallax100.js')}}"></script>
+	<script type="text/javascript" src="vendor/parallax100/parallax100.js"></script>
 
 	<script type="text/javascript">
         $('.parallax100').parallax100();
@@ -679,23 +706,24 @@
 
 
 	<script type="text/javascript">
+	
 		$('.block2-btn-addcart').each(function(){
 			var nameProduct = $(this).parent().parent().parent().find('.block2-name').html();
 			$(this).on('click', function(){
-				swal(nameProduct, "is added to cart !", "success");
+				swal(nameProduct, "Se ha Agregado al carrito!", "success");
 			});
 		});
 
 		$('.block2-btn-addwishlist').each(function(){
 			var nameProduct = $(this).parent().parent().parent().find('.block2-name').html();
 			$(this).on('click', function(){
-				swal(nameProduct, "is added to wishlist !", "success");
+				swal(nameProduct, "Se ha agregado a la lista de deseos!", "success");
 			});
 		});
 	</script>
 
-	<script type="text/javascript" src="{{asset('vendor/daterangepicker/moment.min.js')}}"></script>
+	<script type="text/javascript" src="vendor/daterangepicker/moment.min.js"></script>
 	
-	<script type="text/javascript" src="{{asset('vendor/daterangepicker/daterangepicker.js')}}"></script>
+	<script type="text/javascript" src="vendor/daterangepicker/daterangepicker.js"></script>
 </body>
 </html>
