@@ -13,7 +13,11 @@ class Cliente extends Migration
      */
     public function up()
     {
-        //
+        Schema::table('cliente', function (Blueprint $table) {
+           
+            $table->dateTime('created_at')->nullable()->after('ultima_compra');
+            $table->dateTime('updated_at')->nullable()->after('created_at');
+        });
     }
 
     /**
@@ -23,6 +27,10 @@ class Cliente extends Migration
      */
     public function down()
     {
-        //
+        Schema::table('cliente', function (Blueprint $table) {
+            
+            $table->dropColumn('created_at');
+            $table->dropColumn('updated_at');
+        });
     }
 }

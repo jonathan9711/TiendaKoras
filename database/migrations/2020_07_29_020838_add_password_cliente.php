@@ -13,9 +13,9 @@ class AddPasswordCliente extends Migration
      */
     public function up()
     {
-        Schema::table('cliente', function (Blueprint $table) {
-            $table->string('password',100)->nullable()->after('email');
-        });
+        // Schema::table('cliente', function (Blueprint $table) {
+        //     $table->string('password',100)->nullable()->after('email');
+        // });
     }
 
     /**
@@ -25,6 +25,9 @@ class AddPasswordCliente extends Migration
      */
     public function down()
     {
-        //
+        Schema::table('cliente', function (Blueprint $table) {
+            $table->dropColumn('password');
+        });
+        
     }
 }

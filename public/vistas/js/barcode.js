@@ -41,35 +41,18 @@ function init() {
 
 }
 
-function printTicket(codigo) {
-
-    /*if(data.productos) {
-        data.productos = JSON.parse(data.productos);
-    }
-    console.log(data);*/
-
-
-    var mywindow = window.open('vistas/modulos/print-ticket.php?codigo='+codigo, 'PRINT');
-
-    /*mywindow.document.write('<html><head><title>' + document.title  + '</title>');
-    mywindow.document.write('</head><body >');
-    mywindow.document.write('Hello World');
-    //mywindow.document.write("<table><thead><tr><td>Cant.</td><td>Articulo</td><td>Precio</td><td>Importe</td></tr></thead></table>");
-    mywindow.document.write('</body></html>');
-    mywindow.document.close(); // necessary for IE >= 10*/
-	mywindow.focus(); // necessary for IE >= 10*/
-	setTimeout(function() {
-		mywindow.print();
-		mywindow.close();
-        window.location = "crear-venta";
-	});
+function printTicket(codigo) 
+{
+    var mywindow = window.open('/ajax/print-ticket/'+codigo, 'PRINT');
+    mywindow.print();
 }
 
 function printTicketApartado(idApartado) 
 {
     var mywindow = window.open('vistas/modulos/print-ticketApartado.php?idApartado='+idApartado, 'PRINT');
     mywindow.focus(); 
-    setTimeout(function() {
+    setTimeout(function() 
+    {
         mywindow.print();
         mywindow.close();
         window.location = "apartados";

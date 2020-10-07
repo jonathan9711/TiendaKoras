@@ -1,7 +1,7 @@
 $("#anticipo").focus(function()
 {
 	$(this).val("");
-})
+});
 
 $("#anticipo").blur(function()
 {
@@ -9,7 +9,7 @@ $("#anticipo").blur(function()
 	{
 		$(this).val("0");
 	}
-})
+});
 
 function mostrarTablaVenta(almacenVenta)
 {
@@ -54,19 +54,22 @@ function mostrarTablaVenta(almacenVenta)
 			}
 
 		}
-	})
+	});
 
 	$(".tablaVentas tbody").on("click","button.agregarProducto", function()
 	{
+		alert("producto");
 		var idProductoVenta = $(this).attr("idProducto");
 		var almacenVenta = $('#almacenVenta').val();
 		$(this).removeClass("btn-primary agregarProducto");
 		$(this).addClass("btn-default");
 		var datos = new FormData();
+		
    		datos.append("idProductoVenta", idProductoVenta);
-   		datos.append("almacenVenta", almacenVenta);
+		datos.append("almacenVenta", almacenVenta);
+		
      	$.ajax({
-     		url:"ajax/productos.ajax.php",
+     		url:"ajax/productos",
 	      	method: "POST",
 	      	data: datos,
 	      	cache: false,
@@ -154,7 +157,7 @@ function mostrarTablaVenta(almacenVenta)
 	      	}
 	    })
 
-	})
+	});
 
 	$(".tablaVentas").on("draw.dt", function()
 	{
@@ -167,7 +170,7 @@ function mostrarTablaVenta(almacenVenta)
 				$("#button"+listaIdProductos[i]["idProducto"]).addClass('btn-primary agregarProducto');
 			}
 		}
-	})
+	});
 
 	//localStorage.removeItem("quitarProducto");
 
@@ -214,7 +217,7 @@ function mostrarTablaVenta(almacenVenta)
 	     	agregarImpuesto();
 	     	listarProductos();
 		}
-	})
+	});
 
 	/*=============================================
 	MODIFICAR LA CANTIDAD
@@ -245,7 +248,7 @@ function mostrarTablaVenta(almacenVenta)
 		sumarTotalPrecios();
 		agregarImpuesto();
 		listarProductos();
-	})
+	});
 
 	/*=============================================
 	MODIFICAR LA CANTIDAD
@@ -287,7 +290,7 @@ function mostrarTablaVenta(almacenVenta)
 
 	$("#nuevoImpuestoVenta").change(function(){
 		agregarImpuesto();
-	})
+	});
 	 // PONER FORMATO AL PRECIO DE LOS PRODUCTOS
 	$("#nuevoTotalVenta").number(true, 2);
 
@@ -353,7 +356,7 @@ function mostrarTablaVenta(almacenVenta)
 
 	              '</div>')
 		}
-	})
+	});
 
 	$(".formularioVenta").on("change", "input#nuevoValorEfectivo", function()
 	{
@@ -376,11 +379,11 @@ function mostrarTablaVenta(almacenVenta)
 			nuevoCambioEfectivo.val(cambio);
 		    nuevoCambioEfectivo.number(true, 2);
 		}
-	})
+	});
 
 	$(".formularioVenta").on("change", "input#nuevoCodigoTransaccion", function(){
 	     listarMetodos()
-	})
+	});
 
 	var codigoProductos = [];
 	localStorage.removeItem("listaDProductos");
@@ -389,17 +392,19 @@ function mostrarTablaVenta(almacenVenta)
 	$('.codigoBarra').on('keyup',function(e)
 	{
 		tablaVenta.search(this.value).draw();
-
+		
 		if(e.keyCode == 13)
 		{
 			
 			var idProductoVenta = $("#codigoDVenta").val().toUpperCase();
 			var almacenVenta = $('#almacenVenta').val();
+			
 			var datos = new FormData();
 			datos.append("idProductoVenta", idProductoVenta);
 			datos.append("almacenVenta", almacenVenta);
+			console.log(datos);
 			$.ajax({
-				url:"ajax/productos.ajax.php",
+				url:"ajax/traerproductos",
 				method: "POST",
 				data: datos,
 				cache: false,

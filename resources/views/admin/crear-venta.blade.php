@@ -3,39 +3,36 @@
 @section('contenido')
 
 <div class="content-wrapper">
-@if(Session::has('Mensaje'))
+    <section class="content-header">
 
-<script type="text/javascript">
-        $(document).ready(function()
-        {
-            
-            @if(session()->get('Mensaje')=='Error')
-             swal('El cliente no a sido guardado correctamente', "", "error"); 
-              // swal('', "success");
-            @else
-              swal('{{session()->get("Mensaje")}}', "", "success");
-            @endif
-        });
-        
-</script>
+      <h1><?php
 
+      use App\cliente;   
+      use App\venta;
 
-@endif
-  <section class="content-header">
+      $usuario = Auth::guard("admin")->user();
+      
+      echo (isset($_GET["apartar"]))?"Nuevo Apartado":"Crear Ventas";?></h1>
 
+      <ol class="breadcrumb">
 
-    <h1>Crear Ventas</h1>
-     
-    <ol class="breadcrumb">
+          <li><a href="inicio"><i class="fa fa-dashboard"></i> Inicio</a></li>
 
-        <li><a href="inicio"><i class="fa fa-dashboard"></i> Inicio</a></li>
+          <?php
+            if ($apartar==1) 
+            {
+               echo "<li class='active'><a href='apartados'>Apartados</a></li><li class='active'>Apartar</li>";
+            }
+            else
+            {
+              echo "<li class='active'>Crear venta</li>";
+            }
+          ?>
+      </ol>
 
-    
-    </ol>
-
-  </section>
-
-  <section class="content">
+    </section>
+  
+    <section class="content">
 
       <div class="row">
 
@@ -48,46 +45,45 @@
               <div class="box box-header with-border margin-sale">
 
                 <div class="row margin-dis">
-
-                  <h5 class="name-user">Nombre del usuario</h5>
+                
+                <h5 class="name-user">{{$usuario->nombre}}</h5>
+                  <!-- php echo $_SESSION["nombre"]; -->
 
                   <h5 class="code-sale">  
-                        <?php
 
-                            use App\Http\Controllers\clienteController;
-                            use App\Http\Controllers\VentaController;
+                    <?php
+                    
+                      $ventas = venta::all();
 
-                            $ventas = VentaController::ctrMostrarVentas();
-
-                            if (!$ventas)
-                            {
-                                echo '<input type="hidden" id="nuevaVenta" name="nuevaVenta" value="10001" >';
-                                echo '10001';
-                            }
-                            else
-                            {
-                                foreach ($ventas as $key => $value)
-                                {
-                                  # code...
-                                }
-                                $codigo = $value["codigo"]+1;
-                                  echo '<input type="hidden"  id="nuevaVenta" name="nuevaVenta" value="'.$codigo.'" >';
-                                  echo $codigo;
-                            }
-                        ?>
+                      if (!$ventas)
+                      {
+                          echo '<input type="hidden" id="nuevaVenta" name="nuevaVenta" value="10001" >';
+                          echo '10001';
+                      }
+                      else
+                      {
+                          foreach ($ventas as $key => $value)
+                          {
+                            # code...
+                          }
+                          $codigo = $value["codigo"]+1;
+                            echo '<input type="hidden"  id="nuevaVenta" name="nuevaVenta" value="'.$codigo.'" >';
+                            echo $codigo;
+                      }
+                    ?>
                     
                   </h5>
 
                 </div>
-                
+                 
               </div>
 
-              <input type="hidden" id="nuevoVendedor" value="nombre del vendedor">
+              <input type="hidden" id="nuevoVendedor" value="{{$usuario->nombre}}">
 
-              <input type="hidden" name="idUsuario" value="id del usuario">
+              <input type="hidden" name="idUsuario" value="{{$usuario->id}}">
 
-              <input type="hidden" id="almacenVenta" name = "almacenVenta" value="nombre almacen">
-
+              <input type="hidden" id="almacenVenta" name = "almacenVenta" value="{{$usuario->almacen}}">
+              
               <div class="box-body">
 
                 <div class="box">
@@ -101,30 +97,30 @@
                       <span class="input-group-addon"><i class="fa fa-users"></i></span>
                         
                       <select class="form-control traerProducto" id="seleccionarCliente" name="seleccionarCliente" required>
-                          <?php
-                              if (isset($_GET["apartado"]))
+            
+                        <?php
+                          if (isset($_GET["apartar"]))
+                          {
+                              echo '<option value="">Seleccione un cliente</option>';
+                          }
+                          $item=null;
+                          $valor = null;
+                          $clientes = cliente::all();
+                          foreach ($clientes as $key => $value)
+                          {
+                            if (isset($_GET["apartar"]))
+                            {
+                              if ($value->id_cliente!=1)
                               {
-                                  echo '<option value="">Seleccione un cliente</option>';
+                                echo '<option value="'.$value->id_cliente.'">'.$value->nombre.'</option>';
                               }
-                              $item=null;
-                              $valor = null;
-                              $clientes = clienteController::ctrMostrarClientes($item,$valor);
-                              foreach ($clientes as $key => $value)
-                              {
-                                if (isset($_GET["apartar"]))
-                                {
-                                  if ($value["id_cliente"]!=1)
-                                  {
-                                    echo '<option value="'.$value["id_cliente"].'">'.$value["nombre"].'</option>';
-                                  }
-                                }
-                                else
-                                {
-                                  echo '<option value="'.$value["id_cliente"].'">'.$value["nombre"].'</option>';
-                                }
-                              }
-                          ?>
-                      
+                            }
+                            else
+                            {
+                              echo '<option value="'.$value->id_cliente.'">'.$value->nombre.'</option>';
+                            }
+                          }
+                        ?>
                       </select>
 
                       <span class="input-group-addon">
@@ -198,118 +194,128 @@
                   </div>
 
                   <div class="form-group row">
-                  <?php
-                          if (!isset($_GET["apartar"])) 
-                          {
-                            echo '<div class="col-xs-4" style="padding-right: : 0px">
-                                
-                                <div class="input-group">
-                                          
-                                  <select class="form-control input-lg" id="nuevoMetodoPago" name="nuevoMetodoPago" required>
-                                    <option value="Efectivo">Efectivo</option>
-                                    <option value="TC">Tarjeta de credito</option>
-                                    <option value="TD">Tarjeta debito</option>
-                                  </select>
 
-                                </div>
+                    <?php
+                      if (!isset($_GET["apartar"])) 
+                      {
+                        echo '<div class="col-xs-4" style="padding-right: : 0px">
+                            
+                            <div class="input-group">
+                                      
+                              <select class="form-control input-lg" id="nuevoMetodoPago" name="nuevoMetodoPago" required>
+                                <option value="Efectivo">Efectivo</option>
+                                <option value="TC">Tarjeta de credito</option>
+                                <option value="TD">Tarjeta debito</option>
+                              </select>
+
+                            </div>
+
+                          </div>
+
+                          <div class="cajasMetodoPago">
+                                
+                            <div class="col-xs-4"> 
+
+                              <div class="input-group">
+
+                                <span class="input-group-addon"><i class="ion ion-social-usd"></i></span>
+
+                                <input type="text" class="form-control input-lg" id="nuevoValorEfectivo" name="totalPayment" placeholder="Efectivo" required>
 
                               </div>
 
-                              <div class="cajasMetodoPago">
-                                    
-                                <div class="col-xs-4"> 
+                            </div>
 
-                                  <div class="input-group">
+                            <div class="col-xs-4" id="capturarCambioEfectivo" style="padding-left:0px">
 
-                                    <span class="input-group-addon"><i class="ion ion-social-usd"></i></span>
+                              <div class="input-group">
 
-                                    <input type="text" class="form-control input-lg" id="nuevoValorEfectivo" name="totalPayment" placeholder="Efectivo" required>
+                                <span class="input-group-addon"><i class="ion ion-social-usd"></i></span>
 
-                                  </div>
+                                <input type="text" class="form-control input-lg" id="nuevoCambioEfectivo" placeholder="Cambio" readonly required>
 
-                                </div>
+                              </div>
 
-                                <div class="col-xs-4" id="capturarCambioEfectivo" style="padding-left:0px">
+                            </div>
+                                 
+                          </div>';
+                      }
+                      else
+                      {
+                        date_default_timezone_set('America/Hermosillo');
+                        $fecha = date('Y-m-d');
+                        echo '
+                        <div class="col-md-12">
 
-                                  <div class="input-group">
-
-                                    <span class="input-group-addon"><i class="ion ion-social-usd"></i></span>
-
-                                    <input type="text" class="form-control input-lg" id="nuevoCambioEfectivo" placeholder="Cambio" readonly required>
-
-                                  </div>
-
-                                </div>
-                                    
-                              </div>';
-                          }
-                          else
-                          {
-                            date_default_timezone_set('America/Hermosillo');
-                            $fecha = date('Y-m-d');
-                            echo '
-                            <div class="col-md-12">
-
-                                <div class="form-group">
+                            <div class="form-group">
+              
+                              <div class="input-group">
                   
-                                  <div class="input-group">
-                      
-                                    <span class="input-group-addon"><i class="fa fa-calendar-plus-o"></i></span> 
+                                <span class="input-group-addon"><i class="fa fa-calendar-plus-o"></i></span> 
 
-                                    <input type="date" class="form-control input-lg" name="fechaLimite" value='.date("Y-m-d",strtotime($fecha."+ 5 days")).' required>
+                                <input type="date" class="form-control input-lg" name="fechaLimite" value='.date("Y-m-d",strtotime($fecha."+ 5 days")).' required>
 
-                                  </div>
-
-                                </div>
+                              </div>
 
                             </div>
 
-                            <div class="col-md-12">
+                        </div>
 
-                                <div class="form-group">
+                        <div class="col-md-12">
+
+                            <div class="form-group">
+              
+                              <div class="input-group">
                   
-                                  <div class="input-group">
-                      
-                                    <span class="input-group-addon"><i class="fa fa-calendar-plus-o"></i></span> 
+                                <span class="input-group-addon"><i class="fa fa-calendar-plus-o"></i></span> 
 
-                                    <input type="number" class="form-control input-lg" id="anticipo" name="anticipo" value="0" >
+                                <input type="number" class="form-control input-lg" id="anticipo" name="anticipo" value="0" >
 
-                                  </div>
-
-                                </div>
+                              </div>
 
                             </div>
 
-                            <div class="col-md-12">
+                        </div>
 
-                                  <div class="input-group">
+                        <div class="col-md-12">
 
-                                  <span class="input-group-addon"><i class="fa fa-comment-o"></i></span>
+                              <div class="input-group">
 
-                                  <input type="text" class="form-control input-lg" placeholder="Comentario" name="comentario" autocomplete="off">
-                                  
-                                </div>
-                            </div>';
-                          }
-                        ?>
+                              <span class="input-group-addon"><i class="fa fa-comment-o"></i></span>
+
+                              <input type="text" class="form-control input-lg" placeholder="Comentario" name="comentario" autocomplete="off">
+                              
+                            </div>
+                        </div>';
+                      }
+                    ?>
 
                     <input type="hidden" id="listaMetodoPago" name="listaMetodoPago">
       
                   </div>
-            
+             
               </div>
                   
             </div>
 
-            <div class="box-footer">
-
-              <button type="submit" class="btn btn-primary pull-right"><?php echo (isset($_GET["apartar"]))?"Apartar":"Cobrar";?></button>
-
-            </div>
+           <div class="box-footer">
+           
+            <form  method="post" action="{{route('admin.crearventas')}}"  >
+              {{csrf_field()}}
+              @if(isset($_GET["apartar"])==1)
+              <button class="btn btn-primary pull-right" formaction="{{route('admin.crearapartados')}}">Apartar</button>
+              @else     
+              <button class="btn btn-primary pull-left apartar">Crear Apartado</button>     
+                    
+              <button type="submit" class="btn btn-primary pull-right">Cobrar</button>
+              @endif     
+            </form>
+            
+           
+          </div>         
+           
 
           </form>
-
-            
 
           </div>
           
@@ -332,10 +338,11 @@
           </div>
 
           <div class="box-body">
-            
+            <meta name="csrf-token" content="{{ csrf_token() }}" />
+
             <table class="table table-bordered table-striped dt-responsive tablaVentas">
-              
-              <thead>
+           
+               <thead>
 
                 <tr>
                   <th style="width: 10px">#</th>
@@ -348,34 +355,8 @@
                 </tr>
 
               </thead>
-              <tbody>
-            <!-- recorrido de los productos  -->
-            @foreach($data as $productos)
-            <tr>
-                <td>{{$loop->iteration}}</td>
-                <td>
-                    <img src="{{asset('/'.$productos->product->imagen)}}" class="img-thumbnail img-fluid" alt="" style="width: 50px; height:50px">
-                        
-                </td>
-                <td>{{$productos->product->codigo}}</td>
-                <td>{{$productos->product->nombre}}</td>
-                <td>${{$productos->product->precio_venta}}</td>
-               
-                @if($productos->existencia <= 10)
-                  <td><button class='btn btn-danger'>{{$productos->existencia}}</button></td>
-                @elseif($productos->existencia > 11 && $productos->existencia <= 15)
-                  <td><button class='btn btn-warning'>{{$productos->existencia}}</button></td>
-                @elseif($productos->existencia > 15)
-                  <td><button class='btn btn-success'>{{$productos->existencia}}</button></td>     
-                @endif          
-                <td>
-                    <button class='btn btn-primary agregarProducto' idProducto='".$productos->codigo."' id='button".$productos->codigo."'>Agregar</button>
-                </td>
-                
-            </tr>
-            @endforeach
-        </tbody>       
-        
+
+         
 
             </table>
 
@@ -386,7 +367,7 @@
       </div>
 
     </div>
-
+   
   </section>
 
 </div>
@@ -399,7 +380,7 @@
 
         <div class="modal-content">
 
-            <form role="form" action="{{url('admin/crear-venta')}}" method="post">
+            <form role="form" action="{{route('admin.post-crearcliente')}}" method="post">
                 {{csrf_field()}}
                 <div class="modal-header" style="background: #3c8dbc; color:white">
 
@@ -531,40 +512,63 @@
     </div>
 
 </div>
-    
 
+
+<script src="{{asset('vistas/js/crear-venta.js')}}"></script>
+
+
+<!-- 
 <script type="text/javascript">
-
-    $(".tablaVentas").DataTable({
-            language: {
-            sProcessing: "Procesando...",
-            sLengthMenu: "Mostrar _MENU_ registros",
-            sZeroRecords: "No se encontraron resultados",
-            sEmptyTable: "Ningún dato disponible en esta tabla",
-            sInfo:
-                "Mostrando registros del _START_ al _END_ de un total de _TOTAL_",
-            sInfoEmpty: "Mostrando registros del 0 al 0 de un total de 0",
-            sInfoFiltered: "(filtrado de un total de _MAX_ registros)",
-            sInfoPostFix: "",
-            sSearch: "Buscar:",
-            sUrl: "",
-            sInfoThousands: ",",
-            sLoadingRecords: "Cargando...",
-            oPaginate: {
-                sFirst: "Primero",
-                sLast: "Último",
-                sNext: "Siguiente",
-                sPrevious: "Anterior",
-            },
-            oAria: {
-                sSortAscending:
-                    ": Activar para ordenar la columna de manera ascendente",
-                sSortDescending:
-                    ": Activar para ordenar la columna de manera descendente",
-            },
-    }
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
     });
-</script>
+    // var token = $("#token").val();  
+    $(".tablaVentas").DataTable({
+      "serverSide": true,
+         "ajax":
+          {
+           
+            url: "{{url('ajax/dataTable-ventas')}}",        
+            type: "GET",
+            
+          },
+        
+      "lengthMenu": [[5,10, 25, 50, -1], [5,10, 25, 50, "All"]],
+         language: {
+         sProcessing: "Procesando...",
+         sLengthMenu: "Mostrar _MENU_ registros",
+         sZeroRecords: "No se encontraron resultados",
+         sEmptyTable: "Ningún dato disponible en esta tabla",
+         sInfo:
+             "Mostrando registros del _START_ al _END_ de un total de _TOTAL_",
+         sInfoEmpty: "Mostrando registros del 0 al 0 de un total de 0",
+         sInfoFiltered: "(filtrado de un total de _MAX_ registros)",
+         sInfoPostFix: "",
+         sSearch: "Buscar:",
+         sUrl: "",
+         sInfoThousands: ",",
+         sLoadingRecords: "Cargando...",
+         oPaginate: {
+             sFirst: "Primero",
+             sLast: "Último",
+             sNext: "Siguiente",
+             sPrevious: "Anterior",
+         },
+         oAria: {
+             sSortAscending:
+                 ": Activar para ordenar la columna de manera ascendente",
+             sSortDescending:
+                 ": Activar para ordenar la columna de manera descendente",
+         },
+         
+         
+         }
+    });
+
+
+</script> -->
 
 
 <style>

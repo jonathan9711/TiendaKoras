@@ -9,7 +9,35 @@
         <div style="width: 30%;display: inline-block;vertical-align: middle;">
 
           <div class="input-group">
-            
+            <?php
+
+                use App\almacen;
+                use App\producto;
+
+                $usuario = Auth::guard("admin")->user();
+                $almacen =almacen::all();
+              echo '<input type="hidden" id="perfil" value="'.$usuario->perfil.'">';
+              if ($usuario->perfil == "Gerente General")
+              {                
+                  echo ' <select class="form-control input-lg almacenInventario" id="almacenid">';
+                  foreach ($almacen as $key => $value)
+                  {
+                      echo '<option value="'.$value->id_almacen.'">'.$value->nombre.'</option>';
+                  }
+                  echo '</select>';
+              }
+              else
+              {                  
+                  echo ' <select class="form-control input-lg almacenInventarioRoot" id="almacenid">';
+                  foreach ($almacen as $key => $value)
+                  {
+                      echo '<option value="'.$value->id_almacen.'">'.$value->nombre.'</option>';
+                  }
+                  echo '</select>';
+
+                  echo '<input type="hidden" id="root1" value="'.$usuario->almacen.'">';
+              }
+            ?>
           </div> 
 
         </div>
@@ -44,7 +72,7 @@
 
               <div class="btn-group">
 
-                <a href="movimientos"><button class="btn btn-primary"><i class="fa fa-fw fa-external-link"></i>Movimientos</button></a>
+                <a href="{{route('admin.movimientos')}}"><button class="btn btn-primary"><i class="fa fa-fw fa-external-link"></i>Movimientos</button></a>
                    
               </div>
 
@@ -57,7 +85,7 @@
         <div class="box-body">
 
             <table class="table table-bordered table-striped dt-responsive tablaInventario"> 
-
+              <meta name="csrf-token" content="{{ csrf_token() }}" />
                 <thead>
                   <tr>
                     <th style="width: 10px">#</th>
@@ -112,7 +140,7 @@
                 <span class="input-group-addon"><i class="fa fa-barcode"></i></span> 
 
                 <input type="text" class="form-control input-lg" name="codigoEntrada" id="codigoEntrada" readonly="">
-                <input type="hidden" name="id_producto" id="id_producto">
+                <input type="hidden" name="id_productoS" id="id_productoS">
 
               </div>
 
@@ -221,7 +249,7 @@
                 <span class="input-group-addon"><i class="fa fa-barcode"></i></span> 
 
                 <input type="text" class="form-control input-lg" name="codigoSalida" id="codigoSalida" readonly>
-                <input type="hidden" name="id_productoS" id="id_productoS">
+                <input type="hidden" name="id_producto" id="id_producto">
 
               </div>
 
@@ -308,8 +336,8 @@
 
     <div class="modal-content">
 
-        <form role="form" method="post" enctype="multipart/form-data">
-
+        <form role="form" method="post" action="{{route('admin.movimientosfecha')}}" enctype="multipart/form-data">
+        {{csrf_field()}}
           <div class="modal-header" style="background: #3c8dbc; color:white">
 
             <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -331,7 +359,9 @@
                 <span class="input-group-addon"><i class="fa fa-calendar-plus-o"></i></span> 
 
                 <input type="date" class="form-control input-lg" name="fechainicio" id="fechainicio" value="<?php  echo date('Y-m-d');?>"  required>
-                <input type="hidden" id="idproducto">
+                <input type="hidden" id="idproductoe" name="id_producto">
+                <input type="hidden" id="Almacen" name="id_almacen">
+                <input type="hidden" id="usuario" name="usuario" value="{{$usuario->perfil}}">
 
               </div>
 
@@ -359,53 +389,9 @@
 
             <button type="button" class="btn btn-default pull-left" data-dismiss="modal">salir</button>
 
-            <script type="text/javascript">
+            
 
-              function Href2()
-              {
-                var fechainicio=document.getElementById("fechainicio").value;
-                var fechafin=document.getElementById("fechafin").value;
-                var idproducto=document.getElementById("idproducto").value;
-                var almacen= $("#almacen").val();
-                var datos = new FormData();
-                datos.append("fechainicio",fechainicio);
-                datos.append("fechafin",fechafin);
-                datos.append("idproducto",idproducto);
-                datos.append("almacen",almacen);
-                $.ajax({
-                  url:"ajax/movimientosProductos.ajax.php",
-                  method: "POST",
-                  data: datos,
-                  cache: false,
-                  contentType: false,
-                  processData: false,
-                  dataType: "json",
-                  success:function(respuesta)
-                  {
-                    if (respuesta=="ok")
-                    {
-                      window.location = "index.php?ruta=movimientos&fechaInicio="+fechainicio+"&fechaFin="+fechafin+"&idProducto="+idproducto+"&almacen="+almacen;
-                    }
-                    else
-                    {
-                      swal(
-                      {
-                        type: "error",
-                        title: "¡No hay datos en ese rango de fechas!",
-                        showConfirmButton: true,
-                        confirmButtonText: "Cerrar",
-                        closeOnConfirm: false
-                        }).then((result)=>
-                        {
-                        });
-                       }
-                  }
-                  });
-                 
-              }
-            </script>
-
-            <button type = "button" onclick="Href2()" class="btn btn-primary">ir</button>
+            <button type = "submit" class="btn btn-primary" >ir</button>
  
           </div>
 
@@ -425,8 +411,8 @@
 
     <div class="modal-content">
 
-        <form role="form" method="post" enctype="multipart/form-data">
-
+        <form role="form" method="post" action="{{route('admin.agregarExistencia')}}" enctype="multipart/form-data">
+        {{csrf_field()}}
           <div class="modal-header" style="background: #3c8dbc; color:white">
 
             <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -447,7 +433,17 @@
               
                 <span class="input-group-addon"><i class="fa fa-barcode" ></i></span> 
 
-              
+                <?php
+                 
+                  $respuesta = producto::all();
+                  echo ' <select class="form-control input-lg almacenInventario traerProducto" style="width: 100%" name="idAgregar">';
+                  foreach ($respuesta as $key => $value)
+                  {
+                      echo '<option value="'.$value->id_producto.'">'.$value->codigo." ".$value->nombre.'</option>';
+                  }
+                  echo '</select>';
+
+                ?>
 
               </div>
 
@@ -460,67 +456,88 @@
                     
                 <span class="input-group-addon"><i class="fa fa-bank"></i></span> 
 
+                    <?php
+                     
+
+                      if ($usuario->perfil == "Gerente General")
+                      {
+                          echo ' <select class="form-control input-lg almacenInventario" name="almacenAgregar">';
+                                foreach ($almacen as $key => $value)
+                                {
+                                  echo '<option value="'.$value->id_almacen.'">'.$value->nombre.'</option>';
+                                }
+                          echo '</select>';
+                      }
+                      else
+                      {
+                          echo '<input type="text" class="form-control input-lg" id="almacenAgregar1" readonly>
+                                <input type="hidden" name="almacenAgregarid" id="almacenAgregarid">';
+                      }
+                  ?>
 
                 </div>
 
             </div>
 
-            <!-- ENTRADA PARA LA CANTIDAD -->
+      <!-- ENTRADA PARA LA CANTIDAD -->
 
-             <div class="form-group">
-              
-              <div class="input-group">
-              
-                <span class="input-group-addon"><i class="fa fa-cubes"></i></span> 
+      <div class="form-group">
+        
+        <div class="input-group">
+        
+          <span class="input-group-addon"><i class="fa fa-cubes"></i></span> 
 
-                <input type="number" class="form-control input-lg" name="cantidadAgregar" placeholder="Cantidad" required>
-                <input type="hidden" class="form-control input-lg" name="tipoAgregar"  value= "Entrada">
-
-              </div>
-
-            </div>
-
-            <!-- ENTRADA PARA TIPO DE ENTRADA-->
-
-            <div class="form-group">
-              
-              <div class="input-group">
-              
-                <span class="input-group-addon"><i class="fa fa-toggle-down"></i></span> 
-
-                <select class="form-control input-lg" name="entradaAgregar">
-                  
-                  <option value="">Selecionar tipo de entrada</option>
-                  <option value="Compra">Compra</option>
-                  <option value="Donacion">Donacion</option>
-                  <option value="transferencia">Transferencia</option>
-                  <option value="Devolucion">Devolución</option>
-
-                </select>
-
-              </div>
-
-            </div>
-
-          </div>
+          <input type="number" class="form-control input-lg" name="cantidadAgregar" placeholder="Cantidad" required>
+          <input type="hidden" class="form-control input-lg" name="tipoAgregar"  value= "Entrada">
 
         </div>
 
-          <div class="modal-footer">
+      </div>
 
-            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">salir</button>
+      <!-- ENTRADA PARA TIPO DE ENTRADA-->
 
-            <button type="submit" class="btn btn-primary">Guardar</button>
- 
-          </div>
+      <div class="form-group">
+        
+        <div class="input-group">
+        
+          <span class="input-group-addon"><i class="fa fa-toggle-down"></i></span> 
 
+          <select class="form-control input-lg" name="entradaAgregar">
+            
+            <option value="">Selecionar tipo de entrada</option>
+            <option value="Compra">Compra</option>
+            <option value="Donacion">Donacion</option>
+            <option value="transferencia">Transferencia</option>
+            <option value="Devolucion">Devolución</option>
 
-      </form>
+          </select>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="modal-footer">
+
+    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">salir</button>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+
+  </div>
+
+    </form>
 
     </div>
 
   </div>
 
 </div>
+
+
+<script src="{{asset('vistas/js/inventarios.js')}}"></script>
+<script src="{{asset('vistas/js/barcode.js')}}"></script>
 
 @endsection

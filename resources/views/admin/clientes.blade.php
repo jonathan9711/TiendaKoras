@@ -31,7 +31,7 @@
     <div class="box-body">
 
         <table class="table table-bordered table-striped dt-responsive tablaClientes"> 
-
+        <meta name="csrf-token" content="{{ csrf_token() }}" />
             <thead>
 
               <tr>
@@ -65,141 +65,140 @@
 
 <div id="modalAgregarCliente" class="modal fade" role="dialog">
 
-<div class="modal-dialog">
+    <div class="modal-dialog">
 
-  <div class="modal-content">
+        <div class="modal-content">
 
-      <form role="form" method="post">
+            <form role="form" action="{{route('admin.agregar-clientes')}}" method="post">
+                {{csrf_field()}}
+                <div class="modal-header" style="background: #3c8dbc; color:white">
 
-        <div class="modal-header" style="background: #3c8dbc; color:white">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
 
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Agregar Cliente</h4>
 
-          <h4 class="modal-title">Agregar Cliente</h4>
+                </div>
+
+
+                <div class="modal-body">
+
+                    <div class="box-body">
+
+                        <!-- ENTRADA PARA EL NOMBRE -->
+                    
+                        <div class="form-group">
+                        
+                            <div class="input-group">
+                            
+                                <span class="input-group-addon"><i class="fa fa-user"></i></span> 
+
+                                <input type="text" class="form-control input-lg" name="nombre" placeholder="Ingresar nombre" required>
+
+                            </div>
+
+                        </div>
+                        <!-- ENTRADA PARA EL apellido -->
+                        
+                        <div class="form-group">
+                        
+                            <div class="input-group">
+                            
+                                <span class="input-group-addon"><i class="fa  fa-user"></i></span> 
+
+                                <input type="text" class="form-control input-lg" name="apellido" placeholder="Ingresar apellido" required>
+
+                            </div>
+
+                        </div>
+
+                        <!-- ENTRADA PARA direccion -->
+
+                        <div class="form-group">
+                        
+                            <div class="input-group">
+                            
+                                <span class="input-group-addon"><i class="fa fa-map-marker"></i></span> 
+
+                                <input type="text" class="form-control input-lg" name="direccion" placeholder="Ingresar direccion" required>
+
+                            </div>
+
+                        </div>
+
+                        <!-- ENTRADA PARA LA rfc -->
+
+                        <div class="form-group">
+                        
+                            <div class="input-group">
+                            
+                                <span class="input-group-addon"><i class="fa fa-key"></i></span> 
+
+                                <input type="text" class="form-control input-lg" name="RFC" placeholder="Ingresar RFC" required>
+
+                            </div>
+
+                        </div>
+
+                        <!-- ENTRADA PARA ciudad -->
+
+                        <div class="form-group">
+                        
+                            <div class="input-group">
+                            
+                                <span class="input-group-addon"><i class="fa fa-hospital-o"></i></span> 
+
+                                <input type="text" class="form-control input-lg" name="ciudad" placeholder="Ingresar ciudad" id="nuevaCiudad" required>
+
+                            </div>
+
+                        </div>
+                    
+
+                        <!-- ENTRADA PARA SUBIR email -->
+
+                        <div class="form-group">
+                        
+                            <div class="input-group">
+                            
+                                <span class="input-group-addon"><i class="fa fa-envelope"></i></span> 
+
+                                <input type="email" class="form-control input-lg" name="email" placeholder="Ingresar Email" required>
+
+                            </div>
+
+                        </div>
+
+                        <!-- ENTRADA PARA SELECCIONAR SU telefono -->
+
+                        <div class="form-group">
+                        
+                            <div class="input-group">
+                            
+                                <span class="input-group-addon"><i class="fa fa-phone"></i></span> 
+
+                                <input type="text" class="form-control input-lg" name="telefono" placeholder="Ingresar teléfono" data-inputmask="'mask':'(999) 999-9999'" data-mask required>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">salir</button>
+
+                    <button type="submit" class="btn btn-primary">Registrar</button>
+
+                </div>
+
+
+            </form>
 
         </div>
 
-
-        <div class="modal-body">
-
-          <div class="box-body">
-
-           <!-- ENTRADA PARA EL NOMBRE -->
-          
-          <div class="form-group">
-            
-            <div class="input-group">
-            
-              <span class="input-group-addon"><i class="fa fa-user"></i></span> 
-
-              <input type="text" class="form-control input-lg" name="nuevoNombre" placeholder="Ingresar nombre" required>
-
-            </div>
-
-          </div>
-           <!-- ENTRADA PARA EL apellido -->
-          
-          <div class="form-group">
-            
-            <div class="input-group">
-            
-              <span class="input-group-addon"><i class="fa  fa-user"></i></span> 
-
-              <input type="text" class="form-control input-lg" name="nuevoApellido" placeholder="Ingresar apellido" required>
-
-            </div>
-
-          </div>
-
-          <!-- ENTRADA PARA direccion -->
-
-           <div class="form-group">
-            
-            <div class="input-group">
-            
-              <span class="input-group-addon"><i class="fa fa-map-marker"></i></span> 
-
-              <input type="text" class="form-control input-lg" name="nuevaDireccion" placeholder="Ingresar direccion" required>
-
-            </div>
-
-          </div>
-
-          <!-- ENTRADA PARA LA rfc -->
-
-           <div class="form-group">
-            
-            <div class="input-group">
-            
-              <span class="input-group-addon"><i class="fa fa-key"></i></span> 
-
-              <input type="text" class="form-control input-lg" name="nuevaRfc" placeholder="Ingresar RFC" required>
-
-            </div>
-
-          </div>
-
-           <!-- ENTRADA PARA ciudad -->
-
-           <div class="form-group">
-            
-            <div class="input-group">
-            
-              <span class="input-group-addon"><i class="fa fa-hospital-o"></i></span> 
-
-              <input type="text" class="form-control input-lg" name="nuevaCiudad" placeholder="Ingresar ciudad" id="nuevaCiudad" required>
-
-            </div>
-
-          </div>
-       
-
-          <!-- ENTRADA PARA SUBIR email -->
-
-           <div class="form-group">
-            
-            <div class="input-group">
-            
-              <span class="input-group-addon"><i class="fa fa-envelope"></i></span> 
-
-              <input type="email" class="form-control input-lg" name="nuevoEmail" placeholder="Ingresar Email" required>
-
-            </div>
-
-          </div>
-
-             <!-- ENTRADA PARA SELECCIONAR SU telefono -->
-
-         <div class="form-group">
-            
-            <div class="input-group">
-            
-              <span class="input-group-addon"><i class="fa fa-phone"></i></span> 
-
-              <input type="text" class="form-control input-lg" name="nuevoTelefono" placeholder="Ingresar teléfono" data-inputmask="'mask':'(999) 999-9999'" data-mask required>
-
-            </div>
-
-          </div>
-
-          </div>
-          </div>
-
-         <div class="modal-footer">
-
-          <button type="button" class="btn btn-default pull-left" data-dismiss="modal">salir</button>
-
-          <button type="submit" class="btn btn-primary">Registrar</button>
-
-        </div>
-
-
-
-    </form>
-
-  </div>
-
-</div>
+    </div>
 
 </div>
 
@@ -212,8 +211,8 @@
 
   <div class="modal-content">
 
-      <form role="form" method="post">
-
+      <form role="form" method="post"  action="{{route('admin.editar-cliente')}}">
+       {{csrf_field()}}
         <div class="modal-header" style="background: #3c8dbc; color:white">
 
           <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -231,7 +230,7 @@
           <div class="form-group">
             
             <div class="input-group">
-            
+              
               <span class="input-group-addon"><i class="fa fa-user"></i></span> 
 
               <input type="text" class="form-control input-lg" name="editarCliente" id="editarCliente" required>
@@ -347,4 +346,5 @@
 
 </div>
 
+<script src="{{asset('vistas/js/clientes.js')}}"></script>
 @endsection

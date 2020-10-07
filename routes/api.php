@@ -1,8 +1,9 @@
 <?php
 
+use App\inventario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
+use \Yajra\Datatables\Datatables;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -13,7 +14,14 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+Route::get('ajax/dataTable-ventas',function(){
+    // 'vistaController@mostrarTabla'
+    return datatables()
+    ->eloquent(App\producto::query())->toJson();
+});
+
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+

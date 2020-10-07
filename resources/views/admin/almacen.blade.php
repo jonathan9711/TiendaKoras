@@ -31,7 +31,7 @@
     <div class="box-body">
 
         <table class="table table-bordered table-striped dt-responsive tablaAlmacen"> 
-
+        <meta name="csrf-token" content="{{ csrf_token() }}" />
             <thead>
 
               <tr>
@@ -63,8 +63,8 @@
 
 <div class="modal-content">
 
-    <form role="form" method="post">
-
+    <form role="form" method="post" action="{{route('admin.post-crearalmacen')}}">
+    {{csrf_field()}}
       <div class="modal-header" style="background: #3c8dbc; color:white">
 
         <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -85,7 +85,7 @@
             
               <span class="input-group-addon"><i class="fa fa-building"></i></span> 
 
-              <input type="text" class="form-control input-lg" name="nuevoAlmacen" placeholder="Ingrese Nombre" required>
+              <input type="text" class="form-control input-lg" name="nombre" placeholder="Ingrese Nombre" required>
 
             </div>
 
@@ -99,7 +99,7 @@
             
               <span class="input-group-addon"><i class="fa fa-map-pin"></i></span> 
 
-              <input type="text" class="form-control input-lg" name="nuevaUbicacion" placeholder="Ubicacion" required>
+              <input type="text" class="form-control input-lg" name="ubicacion" placeholder="Ubicacion" required>
 
             </div>
 
@@ -134,8 +134,8 @@
 
 <div class="modal-content">
 
-    <form role="form" method="post">
-
+    <form role="form" method="post" action="{{route('admin.editarAlmacen')}}">
+    {{csrf_field()}}
       <div class="modal-header" style="background: #3c8dbc; color:white">
 
         <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -156,7 +156,7 @@
             
               <span class="input-group-addon"><i class="fa fa-building"></i></span> 
 
-              <input type="text" class="form-control input-lg" name="editarAlmacen" id="editarAlmacen" required>
+              <input type="text" class="form-control input-lg" name="nombre" id="editarAlmacen" placeholder="Nombre del almacen" required>
               <input type="hidden" name="id_almacen" id="id_almacen">
 
             </div>
@@ -171,7 +171,7 @@
             
               <span class="input-group-addon"><i class="fa fa-map-pin"></i></span> 
 
-              <input type="text" class="form-control input-lg" name="editarUbicacion" id="editarUbicacion" required>
+              <input type="text" class="form-control input-lg" name="ubicacion" id="editarUbicacion" placeholder="Ubicacion" required>
 
             </div>
 
@@ -199,5 +199,5 @@
 
 </div>
 
-
+<script src="{{asset('vistas/js/almacen.js')}}"></script>
 @endsection

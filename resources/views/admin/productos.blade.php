@@ -65,9 +65,9 @@
 <div class="modal-dialog">
 
 <div class="modal-content">
-
-    <form role="form" method="post" enctype="multipart/form-data">
-
+  <meta name="csrf-token" content="{{ csrf_token() }}" />
+    <form role="form" method="post" action="{{route('admin.agragarproductos')}}" enctype="multipart/form-data">
+      {{csrf_field()}}
       <div class="modal-header" style="background: #3c8dbc; color:white">
 
         <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -88,7 +88,7 @@
           
             <span class="input-group-addon"><i class="fa fa-barcode"></i></span> 
 
-            <input type="text" class="form-control input-lg" id="Codigo" name="nuevoCodigo" placeholder="Codigo" required>
+            <input type="text" class="form-control input-lg" id="Codigo" name="codigo" placeholder="Codigo" required>
             <span class="input-group-addon" id="print-code" style="cursor: pointer;">
               <i class="fa fa-print"></i>
             </span> 
@@ -105,7 +105,7 @@
           
             <span class="input-group-addon"><i class="fa fa-product-hunt"></i></span> 
 
-            <input type="text" class="form-control input-lg" name="nuevoNombre" placeholder="Ingresar nombre" required>
+            <input type="text" class="form-control input-lg" name="nombre" placeholder="Ingresar nombre" required>
 
           </div>
 
@@ -119,7 +119,7 @@
           
             <span class="input-group-addon"><i class="fa fa-product-hunt"></i></span> 
 
-            <input type="text" class="form-control input-lg" name="nuevaMarca" value = "Generico" placeholder="Ingresar marca">
+            <input type="text" class="form-control input-lg" name="marca" value = "Generico" placeholder="Ingresar marca">
 
           </div>
 
@@ -133,7 +133,7 @@
           
             <span class="input-group-addon"><i class="fa fa-product-hunt"></i></span> 
 
-            <input type="text" class="form-control input-lg" name="nuevaDescripcion" placeholder="Descripcion" id="nuevaDescripcion">
+            <input type="text" class="form-control input-lg" name="descripcion" placeholder="Descripcion" id="nuevaDescripcion">
 
           </div>
 
@@ -146,9 +146,11 @@
 
             <span class="input-group-addon"><i class="fa fa-th"></i></span> 
 
-            <select class="form-control input-lg" name="nuevaCategoria" required>
+            <select class="form-control input-lg" name="id_categoria" required>
               <option value="">Seleccione categoria</option>
-
+              @foreach($categorias as $categoria)
+                <option value="{{$categoria->id}}">{{$categoria->categoria}}</option>
+              @endforeach
              
 
             </select>
@@ -167,7 +169,7 @@
 
               <span class="input-group-addon"><i class="fa fa-arrow-up"></i></span> 
 
-              <input type="number" step="any" class="form-control input-lg" name="nuevoPrecioCompra" min = "0" placeholder="Ingrese precio de compra" id="nuevoPrecioCompra" required>
+              <input type="number" step="any" class="form-control input-lg" name="precio_compra" min = "0" placeholder="Ingrese precio de compra" id="nuevoPrecioCompra" required>
             
             </div>
           </div>
@@ -179,7 +181,7 @@
 
               <span class="input-group-addon"><i class="fa fa-arrow-down"></i></span> 
 
-              <input type="number" step="any" class="form-control input-lg" name="nuevoPrecioVenta" min = "0" placeholder="Ingrese precio de venta" id="nuevoPrecioVenta" required>
+              <input type="number" step="any" class="form-control input-lg" name="precio_venta" min = "0" placeholder="Ingrese precio de venta" id="nuevoPrecioVenta" required>
 
               </div>
 
@@ -216,7 +218,42 @@
           </font>
         </h3>
        
-        <!-- ENTRADA PARA LA CANTIDAD -->
+          <!-- ENTRADA PARA EL ALMACEN -->
+          <?php
+
+              use App\almacen;
+
+              $usuario = Auth::guard("admin")->user();            
+              $almacenes = almacen::all();
+
+              if ($usuario->perfil=="Gerente General")
+              {
+                   echo ' 
+                    <div class="form-group">
+                
+                      <div class="input-group">
+                      
+                        <span class="input-group-addon"><i class="fa fa-bank"></i></span> 
+
+                         <select class="form-control input-lg" name="nuevoalmacen">
+                          <option value="">Selecionar Almacen</option>';
+                          foreach ($almacenes as $key => $value) 
+                          {
+                            echo '<option value="'.$value->id_almacen.'">'.$value->nombre.'</option>';
+                          }
+                         echo '</select>
+
+                      </div>
+
+                    </div>';
+              }
+              else
+              {
+                  echo '<input type="hidden" class="form-control input-lg" name="nuevoalmacen" value="'.$usuario->almacen.'">';
+              }
+             ?>
+             
+            <!-- ENTRADA PARA LA CANTIDAD -->
 
          <div class="form-group">
           
@@ -224,7 +261,7 @@
           
             <span class="input-group-addon"><i class="fa fa-cubes"></i></span> 
 
-            <input type="number" class="form-control input-lg" name="nuevacantidad" placeholder="Cantidad">
+            <input type="number" class="form-control input-lg" name="cantidad" placeholder="Cantidad">
           </div>
 
         </div>
@@ -234,11 +271,11 @@
           
           <div class="panel">SUBIR IMAGEN</div>
 
-          <input type="file" class="nuevaImagen" name="nuevaImagen">
+          <input type="file" class="nuevaImagen" name="imagen">
 
           <p class="help-block">Peso máximo de la foto 2MB</p>
 
-          <img src="vistas/img/productos/default/anonymous.png" class="img-thumbnail previsualizar" width="100px">
+          <img src="{{asset('vistas/img/productos/default/anonymous.png')}}" class="img-thumbnail previsualizar" width="100px">
 
         </div>
 
@@ -273,8 +310,8 @@
 
 <div class="modal-content">
 
-    <form role="form" method="post" enctype="multipart/form-data">
-
+    <form role="form" method="post"  action="{{route('admin.editarproductos')}}"  enctype="multipart/form-data">
+    {{csrf_field()}}
       <div class="modal-header" style="background: #3c8dbc; color:white">
 
         <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -288,7 +325,7 @@
         <div class="box-body">
 
         <!--Codigo-->
-        <input type="hidden" name="editarCodigo" id = "editarCodigo">
+        <input type="hidden" name="codigo" id = "editarCodigo">
 
         <!-- ENTRADA PARA EL nombre -->
         
@@ -298,8 +335,8 @@
           
             <span class="input-group-addon"><i class="fa fa-product-hunt"></i></span> 
 
-            <input type="text" class="form-control input-lg" name="editarNombre" id = "editarNombre" required>
-            <input type="hidden" name="idProducto" id="idProducto">
+            <input type="text" class="form-control input-lg" name="nombre" id = "editarNombre" required>
+            <input type="hidden" name="id_producto" id="idProducto">
 
           </div>
 
@@ -313,7 +350,7 @@
           
             <span class="input-group-addon"><i class="fa fa-product-hunt"></i></span> 
 
-            <input type="text" class="form-control input-lg" name="editarMarca" placeholder="Ingrese marca"  id="editarMarca" required>
+            <input type="text" class="form-control input-lg" name="marca" placeholder="Ingrese marca"  id="editarMarca" required>
 
           </div>
 
@@ -327,7 +364,7 @@
           
             <span class="input-group-addon"><i class="fa fa-product-hunt"></i></span> 
 
-            <input type="text" class="form-control input-lg" name="editarDescripcion" placeholder="Ingrese descripción" id="editarDescripcion" required>
+            <input type="text" class="form-control input-lg" name="descripcion" placeholder="Ingrese descripción" id="editarDescripcion" required>
 
           </div>
 
@@ -344,7 +381,7 @@
 
               <span class="input-group-addon"><i class="fa fa-arrow-up"></i></span> 
 
-              <input type="number" step="any" class="form-control input-lg" name="precioCompra" min = "0"  id="precioCompra" >
+              <input type="number" step="any" class="form-control input-lg" name="precio_compra" min = "0"  id="precioCompra" >
             
             </div>
           </div>
@@ -356,7 +393,7 @@
 
               <span class="input-group-addon"><i class="fa fa-arrow-down"></i></span> 
 
-              <input type="number" step="any" class="form-control input-lg" name="editarPrecioVenta" min = "0"  id="editarPrecioVenta" readonly>
+              <input type="number" step="any" class="form-control input-lg" name="precio_venta" min = "0"  id="editarPrecioVenta" readonly>
 
               </div>
 
@@ -396,8 +433,8 @@
           <input type="file" class="nuevaImagen" name="editarImagen" id="editarImagen">
           <p class="help-block">Peso máximo de la foto 2MB</p>
 
-          <img src="vistas/img/productos/default/anonymous.png" class="img-thumbnail previsualizar" width="100px">
-          <input type="hidden" name="imagenActual" id="imagenActual">
+          <img src="{{asset('vistas/img/productos/default/anonymous.png')}}" class="img-thumbnail previsualizar" width="100px">
+          <input type="hidden" name="imagen" id="imagenActual">
 
         </div>
 
@@ -423,5 +460,6 @@
 
 </div>
 
-
+<script src="{{asset('vistas/js/productos.js')}}"></script>
+<script src="{{asset('vistas/js/barcode.js')}}"></script>
 @endsection

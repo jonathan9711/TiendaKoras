@@ -1,8 +1,11 @@
 <?php
 
 namespace App;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
+use \PDO;
+use App\conexion;
+use DateInterval;
+use DateTime;
 
 class venta extends Model
 {
@@ -25,11 +28,11 @@ class venta extends Model
     }
 
     ////admin
-    static public function mdlActualizarVenta($tabla,$item1,$item2,$id_venta)
+	static public function mdlActualizarVenta($tabla,$item1,$item2,$id_venta)
 	{
-		$stmt=DB::prepare("UPDATE $tabla SET $item1 = :$item1 WHERE id_venta = :id_venta");
-		$stmt->bindParam(":".$item1,$item2);
-		$stmt->bindParam(":id_venta",$id_venta);
+		$stmt=Conexion::conectar()->prepare("UPDATE $tabla SET $item1 = :$item1 WHERE id_venta = :id_venta");
+		$stmt->bindParam(":".$item1,$item2,PDO::PARAM_STR);
+		$stmt->bindParam(":id_venta",$id_venta,PDO::PARAM_STR);
 		if($stmt->execute())
 		{
 			return "ok";
@@ -42,10 +45,40 @@ class venta extends Model
 		$stmt = null;
 	}
 
+	static public function mdlMostrarVentas($tabla, $item, $valor)
+	{
+		if($item != null)
+		{
+
+			$stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE $item = :valor");
+
+			$stmt -> bindParam(":valor", $valor, PDO::PARAM_STR);
+
+			$stmt -> execute();
+
+			return $stmt -> fetch();
+
+		}
+		else
+		{
+
+			$stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla ORDER BY id_venta ASC");
+
+			$stmt -> execute();
+
+			return $stmt -> fetchAll();
+
+		}
+		
+		$stmt -> close();
+
+		$stmt = null;
+
+	}
 
 	static public function mdlMostrarVentasAlmacen($tabla, $item, $valor)
 	{
-		$stmt = DB::prepare("SELECT * FROM $tabla where id_almacen = :valor");
+		$stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla where id_almacen = :valor");
 		$stmt->bindParam(":valor",$valor,PDO::PARAM_STR);
 		$stmt -> execute();
 		return $stmt -> fetchAll();
@@ -56,7 +89,7 @@ class venta extends Model
 
 	static public function mdlMostrarVentaPorFecha($tabla, $item, $valor,$fecha)
 	{
-		$stmt = DB::raw("SELECT * FROM $tabla WHERE $item = :$item AND fecha = :fecha ORDER BY id_venta ASC");
+		$stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE $item = :$item AND fecha = :fecha ORDER BY id_venta ASC");
 
 		$stmt -> bindParam(":".$item, $valor, PDO::PARAM_STR);
 
@@ -259,5 +292,4 @@ class venta extends Model
 			}
 		}
 	}
-
 }

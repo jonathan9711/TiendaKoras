@@ -2,7 +2,14 @@ var tablaApartados = $(".tablaApartados").DataTable({
 		"deferRender": true,
 		"retrieve": true,
 		"processing": true,
-		"ajax":"ajax/dataTable-apartados.ajax.php",
+		"ajax":
+		{
+			url: "/ajax/dataTable-apartados", 
+			headers: {
+				'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+			},
+			type: "GET",
+	    },
 		"rowCallback": function(Row,Data) {
 			n =  new Date();
 			y = n.getFullYear();
@@ -10,8 +17,8 @@ var tablaApartados = $(".tablaApartados").DataTable({
 			d = n.getDate();
 			var fechaLocal = (m>10)?y+"-"+m+"-"+d:y+"-0"+m+"-"+d;
 			var fechaData= Data[7].split("-");
-			console.log("Local", fechaLocal);
-			console.log("data",Data[7]);
+			// console.log("Local", fechaLocal);
+			// console.log("data",Data[7]);
 		    if (Data[7] == fechaLocal || (d>fechaData[2] && m>=fechaData[1]))
 		    {
 		        $('td', Row).css('background-color', '#ff5151');
@@ -48,18 +55,21 @@ var tablaApartados = $(".tablaApartados").DataTable({
 
 $(".tablaApartados tbody").on("click","button.ver",function()
 {
-	var idApartado = $(this).attr("idApartado");
-	window.location="index.php?ruta=apartado-productos&idApartadoVer="+idApartado;
+	var idApartado = $(this).attr("idApartados");
+	// console.log(idApartado);
+	// var mywindow = window.location.replace('/panel/detalle-ventas/'+codigoVenta);
+	 window.location.replace("/panel/detalle-apartado/"+idApartado);
 })
 
 $(".apartar").click(function()
 {
-	console.log("hola");
-	window.location="index.php?ruta=crear-venta&apartar="+1;
+	var mywindow = window.location.replace('/panel/crear-apartado');
 })
 
 $(".tablaApartados tbody").on("click","button.btnEliminarApartado",function(){
-	var idApartado = $(this).attr("idApartado");
+	var idApartado = $(this).attr("idApartados");
+	var datos = new FormData();
+	datos.append("id_apartado", idApartado);
 	swal({
 		title: '¿Esta seguro de cancelar este apartado?',
 		text: "¡si no lo esta puede cancelar!",
@@ -73,12 +83,32 @@ $(".tablaApartados tbody").on("click","button.btnEliminarApartado",function(){
 	{
 		if (result.value)
 		{
-			window.location="index.php?ruta=apartados&idApartado="+idApartado;
+			$.ajax({
+				headers: {
+					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+				},
+				url:"/ajax/borrar-apartado",
+				method: "POST",
+				data: datos,
+				cache: false,
+				contentType: false,
+				processData: false,
+				dataType: "json",
+				success: function(respuesta)
+				{
+					if(respuesta==1){
+						window.location.reload();
+					}			
+				}
+			});
+			// window.location="index.php?ruta=apartados&idApartado="+idApartado;
 		}
 	})	
 })
 
 $(".tablaApartados tbody").on("click","button.btnAbonar",function()
 {
-	$("#id_apartado").val($(this).attr("idApartado"));
+	var idApartado = $(this).attr("idApartados");
+	$("#id_apartados").val(idApartado);
+	
 })

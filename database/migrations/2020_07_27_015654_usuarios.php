@@ -13,7 +13,10 @@ class Usuarios extends Migration
      */
     public function up()
     {
-        //
+        Schema::table('usuarios', function (Blueprint $table) {
+            $table->dateTime('created_at')->nullable()->after('fecha');
+            $table->dateTime('updated_at')->nullable()->after('created_at');
+        });
     }
 
     /**
@@ -23,6 +26,9 @@ class Usuarios extends Migration
      */
     public function down()
     {
-        //
+        Schema::table('usuarios', function (Blueprint $table) {
+            $table->dropColumn('created_at');
+            $table->dropColumn('updated_at');
+        });
     }
 }

@@ -1,12 +1,15 @@
 function mostrarTablaInventario(almacen)
 {
 	var perfil = $("#perfil").val();
-	var almacenRoot = $("#root").val();
+	var almacenRoot = $("#root1").val();
     var	tableInventario = $(".tablaInventario").DataTable({
 		"destroy": true,
 		"ajax":
 		{
-			url: "ajax/dataTable-inventario.ajax.php",
+			headers: {
+				'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+			},
+			url: "/ajax/dataTable-inventario",
 			type: "POST",
 			data:
 			{
@@ -47,11 +50,15 @@ function mostrarTablaInventario(almacen)
 	$(".tablaInventario tbody").on("click","button.btnEntradaProducto",function()
 	{
 		var id_producto = $(this).attr("id_producto");
-		var valor = $("#almacen").val();
+		console.log(id_producto);
+		var valor = $("#almacenid").val();
 		var datos  = new FormData();
 		datos.append("id_producto",id_producto);
 		$.ajax({
-			url:"ajax/inventario.ajax.php",
+			headers: {
+				'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+			},
+			url:"/ajax/inventario",
 			method:"POST",
 			data: datos,
 			cache:false,
@@ -60,11 +67,11 @@ function mostrarTablaInventario(almacen)
 			dataType:"json",
 			success:function(respuesta)
 			{
-				$("#codigoEntrada").val(respuesta["codigo"]);
-	     		$("#id_producto").val(respuesta["id_producto"]);
-	     		$("#codigoSalida").val(respuesta["codigo"]);
-	     		$("#id_productoS").val(respuesta["id_producto"]);
-	     		$("#idproducto").val(respuesta["id_producto"]);
+				$("#codigoEntrada").val(respuesta[0]["codigo"]);
+	     		$("#id_producto").val(respuesta[0]["id_producto"]);
+	     		$("#codigoSalida").val(respuesta[0]["codigo"]);
+	     		$("#id_productoS").val(respuesta[0]["id_producto"]);
+	     		$("#idproductoe").val(respuesta[0]["id_producto"]);
 	     		$("#nuevoAlmacen").val(valor);
 	     		$("#nuevoAlmacenAux").val("Almacen " + valor);
 	     		$("#almacenSalida").val(valor);
@@ -72,20 +79,56 @@ function mostrarTablaInventario(almacen)
 			}
 		})
 	})
+
+	
+	$(".tablaInventario tbody").on("click","button.btnEntradaProductoM",function()
+	{
+		var id_producto = $(this).attr("id_producto");
+		console.log(id_producto);
+		var valor = $("#almacenid").val();
+		var datos  = new FormData();
+		datos.append("id_producto",id_producto);
+		$.ajax({
+			headers: {
+				'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+			},
+			url:"/ajax/inventario",
+			method:"POST",
+			data: datos,
+			cache:false,
+			contentType:false,
+			processData:false,
+			dataType:"json",
+			success:function(respuesta)
+			{		
+	     		$("#id_producto").val(respuesta[0]["id_producto"]);	     		
+	     		$("#id_productoS").val(respuesta[0]["id_producto"]);
+	     		$("#idproductoe").val(respuesta[0]["id_producto"]);
+				$("#nuevoAlmacen").val(valor);
+				$("#Almacen").val(valor);				 
+	     		$("#nuevoAlmacenAux").val("Almacen " + valor);
+	     		$("#almacenSalida").val(valor);
+	     		$("#almacenSalidaAux").val("Almacen " + valor);
+			}
+		})
+	})
+
+
+	
 }
 
 $(".almacenInventario").change(function()
 {
-	var almacenId = $("#almacen").val();
-	var almacenRoot = $("#root").val();
+	var almacenId = $("#almacenid").val();
+	var almacenRoot = $("#root1").val();
 	mostrarTablaInventario(almacenId);
 	localStorage.setItem("almacenActual", JSON.stringify(almacenId));
 })
 
 $(".almacenInventarioRoot").change(function()
 {
-	var almacenId = $("#almacen").val();
-	var almacenRoot = $("#root").val();
+	var almacenId = $("#almacenid").val();
+	var almacenRoot = $("#root1").val();
 	mostrarTablaInventario(almacenId);
 	localStorage.setItem("almacenActual", JSON.stringify(almacenId));
 	if (almacenId == almacenRoot)
@@ -102,13 +145,13 @@ window.onload = function()
 {
     if(localStorage.getItem("almacenActual") == null)
     {
-		var almacenInventario = $('#almacen').val();
+		var almacenInventario = $('#almacenid').val();
 		mostrarTablaInventario(almacenInventario);
 		
 	}
 	else
 	{
-		var almacenStorage = $('#almacen').val();
+		var almacenStorage = $('#almacenid').val();
 		//$("#almacen").val(almacenStorage);
 		mostrarTablaInventario(almacenStorage);
 	}		
@@ -117,9 +160,10 @@ window.onload = function()
 
 $("#agregar").click(function()
 {
-	var valorAlmacen = $('#almacen').val();
-	$("#almacenAgregar1").val("Almacen " + valorAlmacen);
-	$("#almacenAgregar").val(valorAlmacen);
+	var valorAlmacen = $('#almacenid').val();
+	console.log(valorAlmacen);
+	$("#almacenAgregar1").val("Almacen" + valorAlmacen);
+	$("#almacenAgregarid").val(valorAlmacen);
 })
 
 

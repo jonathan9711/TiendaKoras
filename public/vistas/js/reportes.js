@@ -39,8 +39,11 @@ $('#daterange-btn2').daterangepicker(
     var capturarRango = $("#daterange-btn2 span").html();
 
    	localStorage.setItem("capturarRango2", capturarRango);
-
-   	window.location = "index.php?ruta=reportes&fechaInicial="+fechaInicial+"&fechaFinal="+fechaFinal;
+     var datos = new FormData();
+     datos.append("fechaInicial", fechaInicial);
+     datos.append("fechaFinal", fechaFinal);
+    
+     window.location = "admin.reportes.grafico-ventas"+fechaInicial+"&fechaFinal="+fechaFinal;
 
   })
 

@@ -1,5 +1,14 @@
 var table = $(".tablaProductos").DataTable({
-	"ajax":"ajax/dataTable-productos.ajax.php",
+	
+	"ajax":
+		{
+			url: "/ajax/dataTable-productos", 
+			headers: {
+				'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+			},
+			type: "GET",
+	    },
+	
 	"language": {
 
 		"sProcessing":     "Procesando...",
@@ -134,7 +143,10 @@ $(".tablaProductos tbody").on("click","button.btnEditarProducto",function()
 	var datos  = new FormData();
 	datos.append("idProducto",idProducto);
 	$.ajax({
-		url:"ajax/productos.ajax.php",
+		headers: {
+			'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+		},
+		url:"/ajax/editar-producto",
 		method:"POST",
 		data: datos,
 		cache:false,
@@ -143,14 +155,14 @@ $(".tablaProductos tbody").on("click","button.btnEditarProducto",function()
 		dataType:"json",
 		success:function(respuesta)
 		{
-			$("#editarCodigo").val(respuesta["codigo"]);
-			$("#editarNombre").val(respuesta["nombre"]);
-			$("#editarMarca").val(respuesta["marca"]);
-			$("#editarDescripcion").val(respuesta["descripcion"]);
-			$("#precioCompra").val(respuesta["precio_compra"]);
-			$("#editarPrecioVenta").val(respuesta["precio_venta"]);
-			$("#idProducto").val(respuesta["id_producto"]);
-			if (respuesta["imagen"] != "") 
+			$("#editarCodigo").val(respuesta[0]["codigo"]);
+			$("#editarNombre").val(respuesta[0]["nombre"]);
+			$("#editarMarca").val(respuesta[0]["marca"]);
+			$("#editarDescripcion").val(respuesta[0]["descripcion"]);
+			$("#precioCompra").val(respuesta[0]["precio_compra"]);
+			$("#editarPrecioVenta").val(respuesta[0]["precio_venta"]);
+			$("#idProducto").val(respuesta[0]["id_producto"]);
+			if (respuesta[0]["imagen"] != "") 
 			{
 				$("#imagenActual").val(respuesta["imagen"]);
 				$(".previsualizar").attr("src",respuesta["imagen"]);
@@ -164,6 +176,10 @@ $(".tablaProductos tbody").on("click","button.btnEliminarProducto",function()
 	var idProducto = $(this).attr("idProducto");
 	var imagen = $(this).attr("imagen");
 	var nombre = $(this).attr("nombre");
+	var datos = new FormData();
+		datos.append("id_producto", idProducto);
+		datos.append("imagen", imagen);
+		datos.append("nombre", nombre);
 	swal({
 		title: '¿esta seguro que decea borrar el producto?',
 		text: "¡si no lo esta puede cancelar!",
@@ -177,7 +193,25 @@ $(".tablaProductos tbody").on("click","button.btnEliminarProducto",function()
 	{
 		if (result.value)
 		{
-			window.location = "index.php?ruta=productos&nombre="+nombre+"&idProducto="+idProducto+"&imagen="+imagen;
+			$.ajax({
+				headers: {
+					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+				},
+				url:"/ajax/borrar-producto",
+				method: "POST",
+				data: datos,
+				cache: false,
+				contentType: false,
+				processData: false,
+				dataType: "json",
+				success: function(respuesta)
+				{
+					if(respuesta==1){
+						window.location.reload();
+					}
+				}
+			});
+			// window.location = "index.php?ruta=productos&nombre="+nombre+"&idProducto="+idProducto+"&imagen="+imagen;
 		}
 	})
 })
@@ -187,10 +221,13 @@ $("#Codigo").change(function()
 	$(".alert").remove();
 	var codigo = $(this).val();
 	var datos = new FormData();
-	datos.append("validarCodigo",codigo);
+	datos.append("codigo",codigo);
 	$.ajax(
 	{
-		url: "ajax/productos.ajax.php",
+		headers: {
+			'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+		},
+		url: "/ajax/codigo-productos",
 		method: "POST",
 		data: datos,
 		cache: false,
@@ -199,7 +236,7 @@ $("#Codigo").change(function()
 		dataType: "json",
 		success: function(respuesta)
 		{
-			if(respuesta)
+			if(respuesta==1)
 			{
 				$("#Codigo").parent().after('<div class="alert alert-warning">Este codigo ya existe</div>')
 				$("#Codigo").val("");
@@ -213,6 +250,7 @@ $("#Codigo").change(function()
 
 $('#print-code').on('click', function() {
 
+	
 	printBarcode($('#Codigo').val());
 
 });

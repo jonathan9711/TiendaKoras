@@ -48,14 +48,18 @@ $('#daterange-btn3').daterangepicker(
     var perfil = $("#perfil").val();
 
    	localStorage.setItem("capturarRango3", capturarRango);
-
+     var datos = new FormData();
+     datos.append("fechaInicial", fechaInicial);
+     datos.append("fechaFinal", fechaFinal);
+    
     if (perfil == "Gerente General")
     {
-        window.location = "index.php?ruta=movimientos&fechaInicial="+fechaInicial+"&fechaFinal="+fechaFinal;
+      window.location = "/ajax/fechas/"+datos;
     }
     else
     {
-      window.location = "index.php?ruta=movimientos&fechaInicial="+fechaInicial+"&fechaFinal="+fechaFinal+"&almacen="+almacen;
+      datos.append("almacen", almacen);
+      window.location = "/ajax/fechas/"+datos;
     }
    	
 
@@ -100,13 +104,19 @@ $(".daterangepicker.opensright .ranges li").on("click", function(){
 
     var perfil = $("#perfil").val();
 
+    var datos = new FormData();
+    datos.append("fechaInicial", fechaInicial);
+    datos.append("fechaFinal", fechaFinal);
+   
+   
     if (perfil == "Gerente General")
     {
-        window.location = "index.php?ruta=movimientos&fechaInicial="+fechaInicial+"&fechaFinal="+fechaFinal;
+      window.location = "/ajax/fechas/"+datos;
     }
     else
     {
-      window.location = "index.php?ruta=movimientos&fechaInicial="+fechaInicial+"&fechaFinal="+fechaFinal+"&almacen="+almacen;
+      datos.append("almacen", almacen);
+      window.location = "/ajax/fechas/"+datos;
     }
 	}
 

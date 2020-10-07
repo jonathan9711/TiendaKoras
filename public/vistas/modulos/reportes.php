@@ -16,7 +16,7 @@
 
     <section class="content">
 
-        <div class="box">
+    <div class="box">
 
         <div class="box-header with-border">
 
@@ -97,7 +97,7 @@
 
         </div>
 
-      </div>
+    </div>
 
     </section>
 

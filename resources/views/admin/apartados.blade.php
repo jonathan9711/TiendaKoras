@@ -30,6 +30,7 @@
     <div class="box-body">
 
         <table class="table table-bordered table-striped dt-responsive tablaApartados"> 
+        <meta name="csrf-token" content="{{ csrf_token() }}" />
 
             <thead>
 
@@ -66,8 +67,8 @@
 
   <div class="modal-content">
 
-      <form role="form" method="post">
-
+      <form role="form" method="post" action="{{route('admin.darAbono')}}">
+      {{csrf_field()}}
         <div class="modal-header" style="background: #3c8dbc; color:white">
 
           <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -89,7 +90,7 @@
               <span class="input-group-addon"><i class="fa fa-key"></i></span> 
 
               <input type="number" class="form-control input-lg" name="cantidad" placeholder="Ingresar monto" id="cantidad" required>
-              <input type="hidden" name="id_apartado" id="id_apartado">
+              <input type="hidden" name="id_apartado" id="id_apartados">
 
             </div>
 
@@ -117,5 +118,6 @@
 
 </div>
 
-
+<script src="{{asset('vistas/js/apartados.js')}}"></script>
+<script src="{{asset('vistas/js/apartado-productos.js')}}"></script>
 @endsection

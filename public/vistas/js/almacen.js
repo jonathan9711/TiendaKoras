@@ -2,7 +2,15 @@ var tablaAlmacen = $(".tablaAlmacen").DataTable({
 		"deferRender": true,
 		"retrieve": true,
 		"processing": true,
-		"ajax":"ajax/dataTable-almacen.ajax.php",
+		
+		"ajax":
+			{
+				url: "/ajax/dataTable-almacen", 
+				headers: {
+					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+				},
+				type: "GET",
+			},
     	"language": {
 
 			"sProcessing":     "Procesando...",
@@ -44,7 +52,10 @@ $(".tablaAlmacen tbody").on("click","button.btnActivar", function()
 	datos.append("activarAlmacen",estadoAlmacen);
 	$.ajax(
 	{
-		url: "ajax/almacen.ajax.php",
+		headers: {
+			'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+		},
+		url: "/ajax/activas-almacen",
 		method: "POST",
 		data: datos,
 		cache: false,
@@ -75,6 +86,8 @@ $(".tablaAlmacen tbody").on("click","button.btnActivar", function()
 $(".tablaAlmacen tbody").on("click","button.btnEliminarAlmacen", function()
 {
 	var idAlmacen = $(this).attr("idAlmacen");
+	var datos = new FormData();
+		datos.append("id_almacen", idAlmacen);
 		swal({
 		title: '¿Esta seguro de eliminar el alamcen?',
 		text: "¡si no lo esta puede cancelar!",
@@ -88,7 +101,25 @@ $(".tablaAlmacen tbody").on("click","button.btnEliminarAlmacen", function()
 	{
 		if (result.value)
 		{
-			window.location = "index.php?ruta=almacen&idAlmacen="+idAlmacen;
+			$.ajax({
+				headers: {
+					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+				},
+				url:"/ajax/borrar-almacen",
+				method: "POST",
+				data: datos,
+				cache: false,
+				contentType: false,
+				processData: false,
+				dataType: "json",
+				success: function(respuesta)
+				{
+					if(respuesta==1){
+						window.location.reload();
+					}
+				}
+			});
+			// window.location = "index.php?ruta=almacen&idAlmacen="+idAlmacen;
 		}
 	})
 })
@@ -100,7 +131,10 @@ $(".tablaAlmacen tbody").on("click","button.btnEditarAlmacen", function()
 	data.append("idAlmacen",idAlmacen);
 	$.ajax(
 	{
-		url: "ajax/almacen.ajax.php",
+		headers: {
+			'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+		},
+		url: "/ajax/editar-almacen",
 		method: "POST",
       	data: data,
       	cache: false,
@@ -109,9 +143,9 @@ $(".tablaAlmacen tbody").on("click","button.btnEditarAlmacen", function()
      	dataType:"json",
 		success:function(respuesta)
 		{
-			$("#editarAlmacen").val(respuesta["nombre"]);
-			$("#editarUbicacion").val(respuesta["ubicacion"]);
-			$("#id_almacen").val(respuesta["id_almacen"]);
+			$("#editarAlmacen").val(respuesta[0]["nombre"]);
+			$("#editarUbicacion").val(respuesta[0]["ubicacion"]);
+			$("#id_almacen").val(respuesta[0]["id_almacen"]);
 		}
 	})
 })

@@ -1,11 +1,14 @@
 function mostrarTablaUsuarios(almacenId)
 {
-	console.log("almacenID",almacenId);
+	// console.log("almacenID",almacenId);
 	var tableUsuario = $(".tablaUsuarios").DataTable({
 		"destroy":true,
 		"ajax":
 		{
-			url:"ajax/dataTable-usuarios.ajax.php",
+			headers: {
+				'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+			},
+			url:"/ajax/dataTable-usuarios",
 			type: "POST",
 			data:{almacenId:almacenId}
 		},
@@ -46,8 +49,10 @@ function mostrarTablaUsuarios(almacenId)
 		datos.append("idUsuario", idUsuario);
 		
 		$.ajax({
-
-			url:"ajax/usuarios.ajax.php",
+			headers: {
+				'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+			},
+			url:"/ajax/editar-usuario",
 			method: "POST",
 			data: datos,
 			cache: false,
@@ -56,17 +61,17 @@ function mostrarTablaUsuarios(almacenId)
 			dataType: "json",
 			success: function(respuesta)
 			{
-				console.log("datos",respuesta);
-				$("#editarNombre").val(respuesta["nombre"]);
-				$("#editarUsuario").val(respuesta["usuario"]);
-				$("#editarPerfil").html(respuesta["perfil"]);
-				$("#editarPerfil").val(respuesta["perfil"]);
-				$("#fotoActual").val(respuesta["foto"]);
-				$("#editarAlmacen").val(respuesta["almacen"]);
-				$("#passwordActual").val(respuesta["password"]);
-				if (respuesta["foto"] != "") 
+				// console.log("datos",respuesta);
+				$("#editarNombre").val(respuesta[0]["nombre"]);
+				$("#editarUsuario").val(respuesta[0]["usuario"]);
+				$("#editarPerfil").html(respuesta[0]["perfil"]);
+				$("#editarPerfil").val(respuesta[0]["perfil"]);
+				$("#fotoActual").val(respuesta[0]["foto"]);
+				$("#editarAlmacen").val(respuesta[0]["almacen"]);
+				$("#passwordActual").val(respuesta[0]["password"]);
+				if (respuesta[0]["foto"] != "") 
 				{
-					$(".previsualizar").attr("src",respuesta["foto"]);
+					$(".previsualizar").attr("src",'/'+respuesta[0]["foto"]);
 
 				}
 			}});
@@ -82,7 +87,10 @@ function mostrarTablaUsuarios(almacenId)
 		datos.append("activarUsuario",estadoUsuario);
 		$.ajax(
 		{
-			url: "ajax/usuarios.ajax.php",
+			headers: {
+				'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+			},
+			url: "/ajax/activar_usuario",
 			method: "POST",
 			data: datos,
 			cache: false,
@@ -92,7 +100,7 @@ function mostrarTablaUsuarios(almacenId)
 			{
 			}
 		})
-		console.log(estadoUsuario);
+		// console.log(estadoUsuario);
 
 		if(estadoUsuario == 0)
 		{
@@ -114,8 +122,10 @@ function mostrarTablaUsuarios(almacenId)
 	$(".tablaUsuarios tbody").on("click","button.btnEliminarUsuario",function()
 	{
 		var idUsuario = $(this).attr("idUsuario");
-		var fotoUsuario = $(this).attr("fotoUsuario");
 		var usuario = $(this).attr("usuario");
+		var datos = new FormData();
+		datos.append("id_usuario", idUsuario);
+		datos.append("usuario", usuario);
 		swal({
 			title: '¿esta seguro que decea borrar usuario?',
 			text: "¡si no lo esta puede cancelar!",
@@ -130,7 +140,25 @@ function mostrarTablaUsuarios(almacenId)
 		{
 			if (result.value)
 			{
-				window.location = "index.php?ruta=usuarios&idUsuario="+idUsuario+"&usuario="+usuario+"&fotoUsuario="+fotoUsuario;
+				$.ajax({
+					headers: {
+						'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+					},
+					url:"/ajax/borrar-usuario",
+					method: "POST",
+					data: datos,
+					cache: false,
+					contentType: false,
+					processData: false,
+					dataType: "json",
+					success: function(respuesta)
+					{
+						if(respuesta==1){
+							window.location.reload();
+						}
+					}
+				});
+				// window.location = "index.php?ruta=usuarios&idUsuario="+idUsuario+"&usuario="+usuario+"&fotoUsuario="+fotoUsuario;
 			}
 		})
 	})
@@ -183,10 +211,13 @@ $("#nuevoUsuario").change(function()
 	$(".alert").remove();
 	var usuario = $(this).val();
 	var datos = new FormData();
-	datos.append("validarUsuario",usuario);
+	datos.append("usuario",usuario);
 	$.ajax(
 	{
-		url: "ajax/usuarios.ajax.php",
+		headers: {
+			'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+		},
+		url: "/ajax/usuario-existente",
 		method: "POST",
 		data: datos,
 		cache: false,
@@ -195,7 +226,7 @@ $("#nuevoUsuario").change(function()
 		dataType: "json",
 		success: function(respuesta) 
 		{
-			if(respuesta)
+			if(respuesta==1)
 			{
 				$("#nuevoUsuario").parent().after('<div class="alert alert-warning">el usuario ya existe en nuestra base de datos</div>')
 				$("#nuevoUsuario").val("");

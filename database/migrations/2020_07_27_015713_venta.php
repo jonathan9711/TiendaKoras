@@ -13,7 +13,10 @@ class Venta extends Migration
      */
     public function up()
     {
-        //
+        Schema::table('venta', function (Blueprint $table) {
+            $table->dateTime('created_at')->nullable()->after('id_almacen');
+            $table->dateTime('updated_at')->nullable()->after('created_at');
+        });
     }
 
     /**
@@ -23,6 +26,9 @@ class Venta extends Migration
      */
     public function down()
     {
-        //
+        Schema::table('venta', function (Blueprint $table) {
+            $table->dropColumn('created_at');
+            $table->dropColumn('updated_at');
+        });
     }
 }

@@ -13,7 +13,10 @@ class Apartado extends Migration
      */
     public function up()
     {
-        //
+        Schema::table('apartado', function (Blueprint $table) {
+            $table->dateTime('created_at')->nullable()->after('comentario');
+            $table->dateTime('updated_at')->nullable()->after('created_at');
+        });
     }
 
     /**
@@ -23,6 +26,9 @@ class Apartado extends Migration
      */
     public function down()
     {
-        //
+        Schema::table('apartado', function (Blueprint $table) {
+            $table->dropColumn('created_at');
+            $table->dropColumn('updated_at');
+        });
     }
 }

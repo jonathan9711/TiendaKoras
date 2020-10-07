@@ -1,7 +1,8 @@
+
 $("#anticipo").focus(function()
 {
 	$(this).val("");
-})
+});
 
 $("#anticipo").blur(function()
 {
@@ -9,12 +10,16 @@ $("#anticipo").blur(function()
 	{
 		$(this).val("0");
 	}
-})
+});
 
+
+	
 function mostrarTablaVenta(almacenVenta)
 {
+	
 	var tablaVenta = $('.tablaVentas').DataTable(
-	{
+	{ 
+		
 		"destroy":true,
 		"deferRender": true,
 		"retrieve": true,
@@ -24,9 +29,14 @@ function mostrarTablaVenta(almacenVenta)
 		"lengthMenu":[[5, 10, 20, 25, 50, -1], [5, 10, 20, 25, 50, "Todos"]],
 		"ajax":
 		{
-			url: "ajax/dataTable-ventas.ajax.php",
+			url: "/ajax/dataTable-ventas", 
+			headers: {
+				'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+			},
 			type: "POST",
-			data: {almacenVenta:almacenVenta}
+			data:  {almacenVenta:almacenVenta}
+			
+		
 	    },
 		"language": {
 
@@ -54,19 +64,25 @@ function mostrarTablaVenta(almacenVenta)
 			}
 
 		}
-	})
+	});
 
 	$(".tablaVentas tbody").on("click","button.agregarProducto", function()
 	{
+		
 		var idProductoVenta = $(this).attr("idProducto");
 		var almacenVenta = $('#almacenVenta').val();
 		$(this).removeClass("btn-primary agregarProducto");
 		$(this).addClass("btn-default");
 		var datos = new FormData();
    		datos.append("idProductoVenta", idProductoVenta);
-   		datos.append("almacenVenta", almacenVenta);
+		datos.append("almacenVenta", almacenVenta);
+		   
      	$.ajax({
-     		url:"ajax/productos.ajax.php",
+			
+			url: '/ajax/traerproducto',
+			headers: {
+				'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+			},
 	      	method: "POST",
 	      	data: datos,
 	      	cache: false,
@@ -151,10 +167,15 @@ function mostrarTablaVenta(almacenVenta)
 		        listarProductos()
 		        // PONER FORMATO AL PRECIO DE LOS PRODUCTOS
 		        $(".nuevoPrecioProducto").number(true, 2);
-	      	}
+			
+			
+			},
+			error: function(e) {
+		  	console.log(e.responseText);
+		},
 	    })
 
-	})
+	});
 
 	$(".tablaVentas").on("draw.dt", function()
 	{
@@ -167,9 +188,9 @@ function mostrarTablaVenta(almacenVenta)
 				$("#button"+listaIdProductos[i]["idProducto"]).addClass('btn-primary agregarProducto');
 			}
 		}
-	})
+	});
 
-	//localStorage.removeItem("quitarProducto");
+	localStorage.removeItem("quitarProducto");
 
 	$(".formularioVenta").on("click", "button.quitarProducto", function()
 	{
@@ -214,7 +235,7 @@ function mostrarTablaVenta(almacenVenta)
 	     	agregarImpuesto();
 	     	listarProductos();
 		}
-	})
+	});
 
 	/*=============================================
 	MODIFICAR LA CANTIDAD
@@ -245,7 +266,7 @@ function mostrarTablaVenta(almacenVenta)
 		sumarTotalPrecios();
 		agregarImpuesto();
 		listarProductos();
-	})
+	});
 
 	/*=============================================
 	MODIFICAR LA CANTIDAD
@@ -287,9 +308,9 @@ function mostrarTablaVenta(almacenVenta)
 
 	$("#nuevoImpuestoVenta").change(function(){
 		agregarImpuesto();
-	})
-	 // PONER FORMATO AL PRECIO DE LOS PRODUCTOS
-	$("#nuevoTotalVenta").number(true, 2);
+	});
+	//  PONER FORMATO AL PRECIO DE LOS PRODUCTOS
+	// $("#nuevoTotalVenta").number(true, 2);
 
 	$("#nuevoMetodoPago").change(function()
 	{
@@ -353,7 +374,7 @@ function mostrarTablaVenta(almacenVenta)
 
 	              '</div>')
 		}
-	})
+	});
 
 	$(".formularioVenta").on("change", "input#nuevoValorEfectivo", function()
 	{
@@ -376,187 +397,18 @@ function mostrarTablaVenta(almacenVenta)
 			nuevoCambioEfectivo.val(cambio);
 		    nuevoCambioEfectivo.number(true, 2);
 		}
-	})
+	});
 
 	$(".formularioVenta").on("change", "input#nuevoCodigoTransaccion", function(){
 	     listarMetodos()
+	});
+
+	$(".apartar").click(function()
+	{
+		var mywindow = window.location.replace('/panel/crear-apartado');
 	})
 
-	var codigoProductos = [];
-	localStorage.removeItem("listaDProductos");
-	var bandera = 0;
-
-	$('.codigoBarra').on('keyup',function(e)
-	{
-		tablaVenta.search(this.value).draw();
-
-		if(e.keyCode == 13)
-		{
-			
-			var idProductoVenta = $("#codigoDVenta").val().toUpperCase();
-			var almacenVenta = $('#almacenVenta').val();
-			var datos = new FormData();
-			datos.append("idProductoVenta", idProductoVenta);
-			datos.append("almacenVenta", almacenVenta);
-			$.ajax({
-				url:"ajax/productos.ajax.php",
-				method: "POST",
-				data: datos,
-				cache: false,
-				contentType: false,
-				processData: false,
-				dataType:"json",
-				success:function(respuesta)
-				{
-					if (respuesta!="error")
-					{
-
-						if(localStorage.getItem("listaDProductos") != null)
-						{
-							var listaIdProductos = JSON.parse(localStorage.getItem("listaDProductos"));
-							
-							for(var i = 0; i < listaIdProductos.length; i++)
-							{
-								if (idProductoVenta == listaIdProductos[i]["codigo"])
-								{
-									bandera = 1;
-								}
-							}
-						}
-						else
-						{
-							bandera = 0;
-						}
-
-						if (bandera == 0)
-						{
-							$("#button"+idProductoVenta).removeClass("btn-primary agregarProducto");
-							$("#button"+idProductoVenta).addClass("btn-default");
-							var nombre = respuesta[0]["nombre"];
-							var existencia = respuesta[0]["existencia"];
-							var precio = respuesta[0]["precio_venta"];
-							var idDproducto = respuesta[0]["id_producto"];
-							/*=============================================
-							EVITAR AGREGAR PRODUTO CUANDO EL existencia ESTÁ EN CERO
-							=============================================*/
-							if(existencia == 0)
-							{
-								swal({
-								title: "No hay existencia disponible",
-								type: "error",
-								confirmButtonText: "¡Cerrar!"
-								});
-								$("#button"+idProductoVenta).addClass("btn-primary agregarProducto");
-									return;
-							}
-							$(".nuevoProducto").append(
-								'<div class="row" style="padding:5px 15px">'+
-								'<!-- Descripción del producto -->'+
-							
-								'<div class="col-xs-5" style="padding-right:0px">'+
-								
-									'<div class="input-group">'+
-									
-									'<span class="input-group-addon"><button type="button" class="btn btn-danger btn-xs quitarProducto" idProducto="'+idProductoVenta+'"><i class="fa fa-times"></i></button></span>'+
-
-									'<input type="text" class="form-control nuevoNombreProducto" idProducto="'+idDproducto+'" name="agregarProducto" value="'+nombre+'" readonly required>'+
-
-									'</div>'+
-
-								'</div>'+
-
-								'<!-- Cantidad del producto -->'+
-
-								'<div class="col-xs-1">'+
-									
-									'<h5>'+precio+'</h5>'+
-
-								'</div>' +
-
-								'<!-- Cantidad del producto -->'+
-
-								'<div class="col-xs-3">'+
-									
-									'<input type="number" class="form-control nuevaCantidadProducto" id="'+idProductoVenta+'" name="nuevaCantidadProducto" min="1" value="1" existencia="'+existencia+'" nuevaExistencia="'+Number(existencia-1)+'" required>'+
-
-								'</div>' +
-
-								'<!-- Precio del producto -->'+
-
-								'<div class="col-xs-3 ingresoPrecio" style="padding-left:0px">'+
-
-									'<div class="input-group">'+
-
-									'<span class="input-group-addon"><i class="ion ion-social-usd"></i></span>'+
-										
-									'<input type="text" class="form-control nuevoPrecioProducto" precioReal="'+precio+'" name="nuevoPrecioProducto" value="'+precio+'" readonly required>'+
-						
-									'</div>'+
-									
-								'</div>'+
-
-								'</div>') 
-
-							if(localStorage.getItem("listaDProductos") == null)
-							{
-								codigoProductos = [];
-							}
-							else
-							{
-								codigoProductos.concat(localStorage.getItem("listaDProductos"))
-							}
-							codigoProductos.push({"codigo":idProductoVenta});
-							localStorage.setItem("listaDProductos", JSON.stringify(codigoProductos));
-							// SUMAR TOTAL DE PRECIOS
-							sumarTotalPrecios()
-							// AGREGAR IMPUESTO
-							agregarImpuesto()
-							// AGRUPAR PRODUCTOS EN FORMATO JSON
-							listarProductos()
-							// PONER FORMATO AL PRECIO DE LOS PRODUCTOS
-							$(".nuevoPrecioProducto").number(true, 2);
-							$("#codigoDVenta").val("");
-							tablaVenta.search("").draw();
-						}
-						else
-						{
-							var cantidad = $("#"+idProductoVenta).val();
-							var suma = Number(cantidad) + 1;
-							$("#"+idProductoVenta).val(suma);
-							var precio = $("#"+idProductoVenta).parent().parent().children(".ingresoPrecio").children().children(".nuevoPrecioProducto");
-
-							var precioFinal = $("#"+idProductoVenta).val() * precio.attr("precioReal");
-							
-							precio.val(precioFinal);
-
-							var nuevaExistencia = Number($("#"+idProductoVenta).attr("existencia")) - $("#"+idProductoVenta).val();
-							
-							$("#"+idProductoVenta).attr("nuevaExistencia", nuevaExistencia);
-
-							if (Number($("#"+idProductoVenta).val()) > Number($("#"+idProductoVenta).attr("existencia")))
-							{
-								$("#"+idProductoVenta).val(1);
-								swal({
-									title: "La cantidad supera la existencia",
-									text: "¡Solo hay "+$("#"+idProductoVenta).attr("existencia")+" pares!",
-									type: "error",
-									confirmButtonText: "¡Cerrar!"
-								});
-							}
-							sumarTotalPrecios();
-							agregarImpuesto();
-							listarProductos();
-							// PONER FORMATO AL PRECIO DE LOS PRODUCTOS
-							$(".nuevoPrecioProducto").number(true, 2);
-							$("#codigoDVenta").val("");
-							tablaVenta.search("").draw();
-							bandera = 0;
-						}
-					}
-				}
-			})
-		}
-	});
+	
 }
 
 
