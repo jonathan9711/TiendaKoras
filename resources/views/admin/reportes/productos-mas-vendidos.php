@@ -4,10 +4,11 @@ use App\Http\Controllers\Admin\InventarioController;
 use App\producto;
 
 $tabla = "producto";
-$almacen = $_SESSION["almacen"];
-$productos = producto::mdlMostrarProductosMasVendidos($tabla,$almacen);
+$usuario=Auth::guard("admin")->user();
+$almacen = $usuario->almacen;
+$productos = getProductosMasVendidos($almacen);
 $colores = array("red","green","yellow","aqua","purple","blue","cyan","magenta","orange","gold");
-$totalVentas = InventarioController::ctrMostrarSumaVentas($almacen);
+$totalVentas = getTotalVentasAlmacen($almacen);
 
 ?>
 <!--=====================================
@@ -42,7 +43,7 @@ PRODUCTOS MÁS VENDIDOS
           <?php
             for($i = 0; $i < count($productos); $i++)
             {
-               echo ' <li><i class="fa fa-circle-o text-'.$colores[$i].'"></i> '.$productos[$i]["nombre"].'</li>';
+               echo ' <li><i class="fa fa-circle-o text-'.$colores[$i].'"></i> '.$productos[$i]->nombre.'</li>';
             }
           ?>
         </ul>
@@ -65,7 +66,7 @@ PRODUCTOS MÁS VENDIDOS
 
           <div class="product-img">
 
-            <img src="../'.$productos[$i]["imagen"].'" class="img-thumbnail" width="60px" style="margin-right:10px"> 
+            <img src="../'.$productos[$i]->imagen.'" class="img-thumbnail" width="60px" style="margin-right:10px"> 
            
           </div>
 
@@ -73,9 +74,9 @@ PRODUCTOS MÁS VENDIDOS
 
             <a href="" class="product-title">
 
-              '.$productos[$i]["nombre"].'
+              '.$productos[$i]->nombre.'
 
-              <span class="label label-success pull-right">'.ceil($productos[$i]["venta"]*100/$totalVentas["total"]).'%</span>
+              <span class="label label-success pull-right">'.ceil($productos[$i]->venta*100/$totalVentas).'%</span>
 
             </a>
       
@@ -109,10 +110,10 @@ PRODUCTOS MÁS VENDIDOS
   for($i = 0; $i < count($productos); $i++){
 
     echo "{
-      value    : ".$productos[$i]["venta"].",
+      value    : ".$productos[$i]->venta.",
       color    : '".$colores[$i]."',
       highlight: '".$colores[$i]."',
-      label    : '".$productos[$i]["nombre"]."'
+      label    : '".$productos[$i]->nombre."'
     },";
 
   }

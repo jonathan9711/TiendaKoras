@@ -50,7 +50,7 @@ Route::group(['prefix'=>'panel','namespace'=>'Admin'],function(){
             Route::get('/inventario',['uses'=>'InventarioController@vistainventario','as'=>'inventario']);
             Route::post('/inventario',['uses'=>'InventarioController@ctrAgregarExistenciaAlmacen','as'=>'agregarExistencia']);
             Route::get('/movimientos',['uses'=>'MovimientosController@movimientos','as'=>'movimientos']);
-            Route::post('/movimientos-rango',['uses'=>'MovimientosController@movimientos_rango','as'=>'movimientosfecha']);
+            // Route::post('/movimientos-rango',['uses'=>'MovimientosController@movimientos_rango','as'=>'movimientosfecha']);
             
             
 
@@ -145,6 +145,8 @@ Route::post('ajax/fechas','vistaController@Rango_fechas');
 Route::get('ajax/apartar','Admin\ApartadoController@apartar');
 Route::post('ajax/borrar-apartado','Admin\ApartadoController@ctrEliminarApartado');
 Route::post('ajax/liquidar-apartado','Admin\ApartadoController@liquidar');
+Route::post('ajax/Rango_fechas','Admin\MoviminetosController@movimientos_rango');
+
 
 
 Route::post('ajax/inventario','Admin\InventarioController@ajaxEditarProducto');

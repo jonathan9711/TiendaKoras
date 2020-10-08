@@ -1,13 +1,70 @@
 <?php
 
 use App\almacen;
+use App\cliente;
 use App\Movimientos;
 use App\producto;
 use App\usuarios;
+use Illuminate\Support\Facades\DB;
+use PhpParser\Node\Stmt;
 
 function getUsuarios()
 {
     return usuarios::all();
+}
+
+
+function getProductosMasVendidos($almacen)
+{
+  
+  if($almacen!=null){
+    $stmt = DB::table('producto')
+    ->join('inventario', 'producto.id_producto', '=', 'inventario.id_producto')
+    ->where('inventario.id_almacen', '=', $almacen)
+    ->orderBy('inventario.venta','desc')
+    ->get();
+    return $stmt;
+  }else{
+      $stmt = DB::table('producto')
+      ->join('inventario','producto.id_producto', '=', 'inventario.id_producto')
+      ->select('producto.id_producto','producto.imagen','producto.nombre',DB::raw('sum(inventario.venta) as venta'))
+      ->groupBy('producto.nombre','producto.id_producto','producto.imagen')
+      ->orderBy('inventario.venta','desc')
+      ->get();
+    
+    return $stmt;
+  }
+}
+
+function mdlMostrarAlmacen($item,$valor){
+  if ($item!=null)
+  {
+  
+    $stmt = almacen::where($item, $valor)->get();
+    return $stmt;
+  }
+  else
+  {
+    
+    $stmt = almacen::all();
+    return $stmt;
+  }
+}
+
+function ctrMostrarClientes($item, $valor){
+  if ($item!=null)
+  {
+    
+    $stmt=cliente::where($item,$valor);
+    return $stmt;
+  }
+  else
+  {
+   
+    $stmt=cliente::all();
+    return $stmt;
+
+  }	
 }
 
 
@@ -21,6 +78,28 @@ function getTotalVentas()
     }
     return $total;
 }
+function getTotalVentasAlmacen($almacen)
+{
+  $total=0;
+  if($almacen==null){
+    $ventas=App\inventario::all();
+    
+    foreach($ventas as $venta)
+    {
+        $total+=$venta->venta;
+    }
+    return $total;
+  }else{
+    $ventas=App\inventario::where('id_almacen',$almacen)->get();
+    
+    foreach($ventas as $venta)
+    {
+        $total+=$venta->venta;
+    }
+    return $total;
+  }
+}
+
 function getTotalCount($todo)
 {
   $clientes=$todo;

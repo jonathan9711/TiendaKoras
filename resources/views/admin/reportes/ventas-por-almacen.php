@@ -8,7 +8,7 @@ $item = null;
 $valor = null;
 $tabla = "almacen";
 
-$almacen = Almacen::mdlMostrarAlmacen($tabla,$item,$valor);
+$almacen = mdlMostrarAlmacen($item,$valor);
 $ventas = venta::all();
 
 $arrayAlmacen = array();

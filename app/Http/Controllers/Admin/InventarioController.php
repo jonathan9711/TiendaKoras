@@ -99,33 +99,33 @@ class InventarioController extends Controller
 		return response()->json($respuesta);
 	}
 
-    public static function ctrMostrarInventario($item,$valor,$almacen)
-    {
-        $tabla = "inventario";
-        $respuesta = Inventario::mdlMostrarInventario($tabla,$item,$valor,$almacen);
-        return $respuesta;
-    }
+    // public static function ctrMostrarInventario($item,$valor,$almacen)
+    // {
+    //     $tabla = "inventario";
+    //     $respuesta = Inventario::mdlMostrarInventario($tabla,$item,$valor,$almacen);
+    //     return $respuesta;
+    // }
 
-    public static function ctrMostrarTodo()
-    {
-        $tabla = "inventario";
-        $respuesta = ModeloModelos::mdlMostrarTodo($tabla);
-        return $respuesta;
-    }
+    // public static function ctrMostrarTodo()
+    // {
+    //     $tabla = "inventario";
+    //     $respuesta = ModeloModelos::mdlMostrarTodo($tabla);
+    //     return $respuesta;
+    // }
 
-    public static function ctrMostrar($item,$valor)
-    {
-        $tabla = "inventario";
-        $respuesta = ModeloModelos::mdlMostrar($tabla,$item,$valor);
-        return $respuesta;
-    }
+    // public static function ctrMostrar($item,$valor)
+    // {
+    //     $tabla = "inventario";
+    //     $respuesta = ModeloModelos::mdlMostrar($tabla,$item,$valor);
+    //     return $respuesta;
+    // }
 
-    static public function ctrMostrarSumaVentas($almacen)
-    {
-       $tabla = "inventario";
-       $respuesta = Inventario::mdlMostrarSumaVentas($tabla,$almacen);
-       return $respuesta;
-   }
+    // static public function ctrMostrarSumaVentas($almacen)
+    // {
+    //    $tabla = "inventario";
+    //    $respuesta = Inventario::mdlMostrarSumaVentas($tabla,$almacen);
+    //    return $respuesta;
+    // }
 
     //metodo para entrada de un producto
     public static function ctrAgregarInventario()

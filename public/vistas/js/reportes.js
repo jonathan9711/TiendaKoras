@@ -42,8 +42,23 @@ $('#daterange-btn2').daterangepicker(
      var datos = new FormData();
      datos.append("fechaInicial", fechaInicial);
      datos.append("fechaFinal", fechaFinal);
-    
-     window.location = "admin.reportes.grafico-ventas"+fechaInicial+"&fechaFinal="+fechaFinal;
+     $.ajax({
+			headers: {
+				'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+			},
+			url:"/ajax/Rango_fechas",
+			method:"POST",
+			data: datos,
+			cache:false,
+			contentType:false,
+			processData:false,
+			dataType:"json",
+			success:function(respuesta)
+			{		
+	     	
+			}
+		})
+    //  window.location = "admin.reportes.grafico-ventas"+fechaInicial+"&fechaFinal="+fechaFinal;
 
   })
 

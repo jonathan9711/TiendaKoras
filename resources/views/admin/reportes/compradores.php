@@ -8,7 +8,7 @@ $item = null;
 $valor = null;
 
 $ventas = venta::all();
-$clientes = ClienteController::ctrMostrarClientes($item, $valor);
+$clientes = ctrMostrarClientes($item, $valor);
 $arrayClientes = array();
 $arraylistaClientes = array();
 
