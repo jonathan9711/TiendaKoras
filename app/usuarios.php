@@ -24,7 +24,7 @@ class usuarios extends Authenticatable
         'perfil', 
         'foto', 
         'almacen', 
-        'estado', 
+        'estado',
         'ultimo_login', 
         'fecha'
     ];

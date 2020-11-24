@@ -31,9 +31,10 @@ class AuthController extends Controller
             session()->flash('messages', 'error|No Existe un usuario con ese correo');
             return redirect()->back();
         }
-
+        
         if (Auth::guard('admin')->attempt(['usuario' => $email, 'password' => $pass],$request->get('remember-me', 0)))
         {
+           
             return redirect()->route('admin.inicio');
         }
         session()->flash('messages', 'error|El password es incorrecto');
@@ -44,7 +45,8 @@ class AuthController extends Controller
     {
         Auth::guard('admin')->logout();
         session()->flush();
-        return redirect('/');
+        session()->regenerate();
+        return redirect('/panel');
     }
 
 

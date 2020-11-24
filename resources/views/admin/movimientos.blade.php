@@ -6,7 +6,7 @@
     <section class="content-header">
 
         <h1>Movimientos</h1>
-
+        <meta name="csrf-token" content="{{ csrf_token() }}" />
         <ol class="breadcrumb">
 
             <li><a href="inicio"><i class="fa fa-dashboard"></i>Inicio</a></li>
@@ -41,7 +41,7 @@
                 <?php
 
 
-                if (!isset($_GET["idProducto"]))
+                if ($id_producto==null)
                 {
                     $usuario= Auth::guard("admin")->user();
                     $idAlmacen =$usuario->almacen;
@@ -131,7 +131,7 @@
 </div>
 
 
-<script src="{{asset('vistas/js/movimientos.js')}}"></script>
+<script type="text/javascript" src="{{asset('vistas/js/movimientos.js')}}"></script>
 <script type="text/javascript">
   
     $(".tablas").DataTable({

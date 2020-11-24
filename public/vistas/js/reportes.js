@@ -37,26 +37,49 @@ $('#daterange-btn2').daterangepicker(
     var fechaFinal = end.format('YYYY-M-D');
 
     var capturarRango = $("#daterange-btn2 span").html();
-
+    var almacen = $("#almacenes").val();
    	localStorage.setItem("capturarRango2", capturarRango);
-     var datos = new FormData();
-     datos.append("fechaInicial", fechaInicial);
-     datos.append("fechaFinal", fechaFinal);
-     $.ajax({
-			headers: {
-				'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-			},
-			url:"/ajax/Rango_fechas",
-			method:"POST",
-			data: datos,
-			cache:false,
-			contentType:false,
-			processData:false,
-			dataType:"json",
-			success:function(respuesta)
-			{		
-	     	
-			}
+    var datos = new FormData();
+    datos.append("fechaInicial", fechaInicial);
+    datos.append("fechaFinal", fechaFinal);
+    datos.append("almacen", almacen);
+    
+    $.ajax({
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      },
+      url:"/ajax/Rango_fechas_grafico",
+      method:"POST",
+      data: datos,
+      cache:false,
+      contentType:false,
+      processData:false,
+      dataType:"json",
+      success:function(respuesta)
+      {
+        $("#line-chart-ventas").empty();
+        Morris.Line({
+          element          : 'line-chart-ventas',
+          resize           : true,
+          data             : [respuesta],
+          xkey             : 'y',
+          ykeys            : ['ventas'],
+          labels           : ['ventas'],
+          lineColors       : ['#efefef'],
+          lineWidth        : 2,
+          hideHover        : 'auto',
+          gridTextColor    : '#fff',
+          gridStrokeWidth  : 0.4,
+          pointSize        : 4,
+          pointStrokeColors: ['#efefef'],
+          gridLineColor    : '#efefef',
+          gridTextFamily   : 'Open Sans',
+          preUnits         : '$',
+          gridTextSize     : 10
+        });
+
+          // window.location.replace(respuesta);
+      }
 		})
     //  window.location = "admin.reportes.grafico-ventas"+fechaInicial+"&fechaFinal="+fechaFinal;
 
@@ -97,7 +120,7 @@ $(".daterangepicker.opensright .ranges li").on("click", function(){
 
     	localStorage.setItem("capturarRango2", "Hoy");
 
-    	window.location = "index.php?ruta=reportes&fechaInicial="+fechaInicial+"&fechaFinal="+fechaFinal;
+    	// window.location = "index.php?ruta=reportes&fechaInicial="+fechaInicial+"&fechaFinal="+fechaFinal;
 
 	}
 

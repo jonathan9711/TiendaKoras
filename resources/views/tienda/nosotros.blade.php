@@ -2,9 +2,9 @@
 
 @section('contenido')
     	<!-- Title Page -->
-	<section class="bg-title-page p-t-40 p-b-50 flex-col-c-m" style="background-image: url({{asset('vistas/img/plantilla/nosotros1.jpg')}});">
+	<section class="bg-title-page p-t-40 p-b-50 flex-col-c-m" style="background-image: url({{asset('vistas/img/plantilla/nosotros2.jpg')}});">
 		<h2 class="l-text2 t-center">
-			Sobre Nosotros
+			Acerca De Nosotros
 		</h2>
 	</section>
 

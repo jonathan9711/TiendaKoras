@@ -1,7 +1,7 @@
 <header class="main-header">
 	<!--lotipo-->
 
-	<a href="inicio" class = "logo" >
+	<a href="{{route('admin.inicio')}}" class = "logo" >
 		<!--logo mini-->
 	    <span class = "logo-mini">
 	    	<label style="margin-left: 1px;">Roar</label>
@@ -26,19 +26,8 @@
     		<ul class = "nav navbar-nav">
 
                  <li style="padding-top: 8px;">
-                    <?php
-                      // $_SESSION["id"]
-					    //         use App\Http\Controllers\AlmacenController;
-          			    //   use App\Http\Controllers\UsuariosController;
-                     
-                        // $usuario = session()->get('Usuario')->id;
-                        // $item = "id";
-                        // $respuesta = UsuariosController::ctrMostrarUsuarios($item,$usuario);
-                        // $almacen = $respuesta[0]->almacen;
-						// $respuesta = AlmacenController::ctrGetNombreAlmacen($almacen);
-
+                    <?php                      
 						use App\almacen;
-
 						$usuario = Auth::guard("admin")->user();
 						$almacen = almacen::where("id_almacen",$usuario->almacen)->get();
 					?>
@@ -54,7 +43,7 @@
 					@if($usuario->imagen)
 					<img src="{{asset($usuario->imagen)}}" class="user-image">
 					@else
-					<img src="{{asset('img/usuarios/default/anonymous.png')}}" class="user-image">
+					<img src="{{asset($usuario->foto)}}" class="user-image">
 					@endif
 					<span class = "hidden-xs">{{$usuario->nombre}} {{$usuario->perfil}}</span>            	
     					
@@ -67,7 +56,7 @@
     					<li class="user-body">
     						<div class = "pull-right">
 
-    							<a href="salir" class="btn btn-default btn-flat">salir</a>
+    							<a href="{{route('admin.cerrar-sesion')}}" class="btn btn-default btn-flat">salir</a>
     							
     						</div>
     					</li>
@@ -88,80 +77,91 @@
   <section class="sidebar" style="height: 500px;">
 
     <ul class="sidebar-menu">
- 
+	@if ($usuario->perfil == "Gerente General")
+			
         <li>
 			<a href="{{route('admin.inicio')}}" title="Inicio">
 				<i class="fa fa-home"></i>
 				<span>Inicio</span>
 			</a>
         </li>
+	@endif
         <li>
 			<a href="{{route('admin.crear-venta')}}" title="Venta">
 				<i class="fa fa-barcode"></i>
 				<span>Crear Venta</span>
 			</a>
 		</li>
-		<li>
-			<a href="{{route('admin.ventas')}}" title="Administrar Ventas">
-				<i class="fa fa-book"></i>
-				<span>Administrar venta</span>
-			</a>
+		@if($usuario->perfil != "Vendedor")    	
+			<li>
+				<a href="{{route('admin.ventas')}}" title="Administrar Ventas">
+					<i class="fa fa-book"></i>
+					<span>Administrar venta</span>
+				</a>
 
-		</li>
-		            
-		<li>
-			<a href="{{route('admin.productos')}}" title = "Administrar Productos">
-				<i class="fa fa-archive"></i>				
-				<span>Productos</span>
-			</a>
-		</li>
+			</li>
+						
+			<li>
+				<a href="{{route('admin.productos')}}" title = "Administrar Productos">
+					<i class="fa fa-archive"></i>				
+					<span>Productos</span>
+				</a>
+			</li>
 
-		<li>
-			<a href="{{route('admin.inventario')}}" title="Administrar Inventario">
-				<i class="fa fa-folder"></i>
-				<span>Inventarios</span>
-			</a>
-		</li>
-		<li>
-			<a href="{{route('admin.clientes')}}" title="Clientes">
-				<i class="fa fa-users"></i>
-				<span>Clientes</span>
-			</a>
-		</li>
-              
-		<li>
-			<a href="{{route('admin.usuarios')}}" title = "Usuarios">
-				<i class="fa fa-user"></i>
-				<span>Usuarios</span>
-			</a>
-		</li>
+			<li>
+				<a href="{{route('admin.inventario')}}" title="Administrar Inventario">
+					<i class="fa fa-folder"></i>
+					<span>Inventarios</span>
+				</a>
+			</li>
+			<li>
+				<a href="{{route('admin.clientes')}}" title="Clientes">
+					<i class="fa fa-users"></i>
+					<span>Clientes</span>
+				</a>
+			</li>
+		@endif
+        @if($usuario->perfil == "Gerente General")                  
+			<li>
+				<a href="{{route('admin.usuarios')}}" title = "Usuarios">
+					<i class="fa fa-user"></i>
+					<span>Usuarios</span>
+				</a>
+			</li>
 
-		<li>
-			<a href="{{route('admin.almacen')}}" title = "Almacenes">
-				<i class="fa fa-building"></i>
-				<span>Almacenes</span>
-			</a>
-		</li>
+			<li>
+				<a href="{{route('admin.almacen')}}" title = "Almacenes">
+					<i class="fa fa-building"></i>
+					<span>Almacenes</span>
+				</a>
+			</li>
 
-		<li>
-			<a href="{{route('admin.categoria')}}" title="Administrar Categorias">
-				<i class="fa fa-th"></i>
-				<span>Categorías</span>
-			</a>
-		</li>
-
-		<li>
-			<a href="{{route('admin.reportes')}}" title = "Reportes">
-				<i class="fa fa-bar-chart"></i>
-				<span>Reportes</span>
-			</a>
-		</li>
-            
+			<li>
+				<a href="{{route('admin.categoria')}}" title="Administrar Categorias">
+					<i class="fa fa-th"></i>
+					<span>Categorías</span>
+				</a>
+			</li>
+		@endif
+		@if ($usuario->perfil != "Vendedor")            
+			<li>
+				<a href="{{route('admin.reportes')}}" title = "Reportes">
+					<i class="fa fa-bar-chart"></i>
+					<span>Reportes</span>
+				</a>
+			</li>
+        @endif    
 
 		<li>
 			<a href="{{route('admin.apartados')}}" title="apartados">
 				<i class="fa  fa-hand-lizard-o"></i>
 				<span>Apartados</span>
+			</a>
+		</li>
+		<li>
+			<a href="{{route('admin.VerOrden')}}" title="ordenes">
+				<i class="fa  fa-telegram"></i>
+				<span>Ordenes</span>
 			</a>
 		</li>
 

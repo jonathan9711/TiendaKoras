@@ -28,12 +28,12 @@ class productoController extends Controller
 	//admin
 
 	//ajax mostrar tabla productos en crear venta
-	public function mostrarTablaProducto()
+	public function mostrarTablaProducto(Request $request)
 	{
 		
-			$valor = $_POST["almacenVenta"];
+			$valor = $request->almacenVenta;
 			
-			$productos = inventario::all();			 
+			$productos = inventario::where('id_almacen',$valor)->get();;			 
 			$res = [ "data" => []];
 			
 			foreach($productos as $key => $value)
@@ -310,42 +310,55 @@ class productoController extends Controller
 		
 	}
 
-
-    public static function ctrMostrarProductos($item,$valor)
-	{
-		$tabla = "producto";
-		$respuesta = Producto::mdlMostrarProductos($tabla,$item,$valor);
-		return $respuesta;
+	public function existenciaProducto(Request $request){
+		$cantidad=$request->cantidad;
+		$id=$request->id;
+		// $producto=producto::where('id_producto',$id)->first();
+		$inventario=inventario::where('id_producto',$id)->where('id_almacen',3)->first();
+		 dd($request);
+		if($cantidad<=$inventario->existencia){
+			return 1;
+		}else{
+			return 0;
+		}
 	}
 
-	public static function ctrMostrarProductosOrden($orden)
-	{
-		$tabla = "producto";
-		$respuesta = Producto::mdlMostrarProductosOrden($tabla,$orden);
-		return $respuesta;
-	}
 
-	public static function ctrMostrarProductosInner($valor)
-	{
-		$orden = null;
-		$tabla = "producto";
-		$respuesta = Producto::mdlMostrarProductosInventario($tabla,$valor,$orden);
-		return $respuesta;
-	}
+    // public static function ctrMostrarProductos($item,$valor)
+	// {
+	// 	$tabla = "producto";
+	// 	$respuesta = Producto::mdlMostrarProductos($tabla,$item,$valor);
+	// 	return $respuesta;
+	// }
 
-	public static function ctrMostrarProductosOrdenados($valor)
-	{
-		$tabla = "producto";
-		$respuesta = Producto::mdlMostrarProductosOrdenados($tabla,$valor);
-		return $respuesta;
-	}
+	// public static function ctrMostrarProductosOrden($orden)
+	// {
+	// 	$tabla = "producto";
+	// 	$respuesta = Producto::mdlMostrarProductosOrden($tabla,$orden);
+	// 	return $respuesta;
+	// }
 
-	public static function ctrMostrarProductosVenta($item,$valor,$almacen)
-	{
-		$tabla = "producto";
-		$respuesta = Producto::mdlMostrarProductosVenta($tabla,$valor,$almacen);
-		return $respuesta;
-	}
+	// public static function ctrMostrarProductosInner($valor)
+	// {
+	// 	$orden = null;
+	// 	$tabla = "producto";
+	// 	$respuesta = Producto::mdlMostrarProductosInventario($tabla,$valor,$orden);
+	// 	return $respuesta;
+	// }
+
+	// public static function ctrMostrarProductosOrdenados($valor)
+	// {
+	// 	$tabla = "producto";
+	// 	$respuesta = Producto::mdlMostrarProductosOrdenados($tabla,$valor);
+	// 	return $respuesta;
+	// }
+
+	// public static function ctrMostrarProductosVenta($item,$valor,$almacen)
+	// {
+	// 	$tabla = "producto";
+	// 	$respuesta = Producto::mdlMostrarProductosVenta($tabla,$valor,$almacen);
+	// 	return $respuesta;
+	// }
 
 	public static function ctrBorrarProducto(Request $request)
 	{

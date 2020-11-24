@@ -36,6 +36,15 @@ function getProductosMasVendidos($almacen)
   }
 }
 
+ function countCantidad($cart, $count)
+  {
+      foreach($cart as $id=>$carrito){
+          $count+=$cart[$id]['cantidad'];
+      }
+     
+      return $count;
+  }
+
 function mdlMostrarAlmacen($item,$valor){
   if ($item!=null)
   {
@@ -115,48 +124,48 @@ function ctrRangoFechasVentas($fechaInicial, $fechaFinal,$almacen)
 {
   if ($almacen == null)
   {
-    if($fechaInicial == null)
-    {
-      $stmt = App\venta::all();
-    
-      return $stmt;	
-    }
-    else if($fechaInicial == $fechaFinal)
-    {
-      $stmt = App\venta::where('fecha','like','%',$fechaFinal,'%');
+      if($fechaInicial == null)
+      {
+        $stmt = App\venta::all();
       
-      return $stmt;		
-    }
-    else
-    {
-      $fechaFinal = new DateTime();
-      $fechaFinal->add(new DateInterval('P1D'));
-      $fechaFinal2 = $fechaFinal->format('Y-m-d');
-      $stmt = App\venta::whereBetween('fecha',[$fechaInicial,$fechaFinal2]);
-     
-      return $stmt;	        
-    }
+        return $stmt;	
+      }
+      else if($fechaInicial == $fechaFinal)
+      {
+        $stmt = App\venta::where('fecha','like','%',$fechaFinal,'%')->get();
+        
+        return $stmt;		
+      }
+      else
+      {
+        $fechaFinal = new DateTime();
+        $fechaFinal->add(new DateInterval('P1D'));
+        $fechaFinal2 = $fechaFinal->format('Y-m-d');
+        $stmt = App\venta::whereBetween('fecha',[$fechaInicial,$fechaFinal2])->get();
+        
+        return $stmt;	        
+      }
   }
   else
   {
     if($fechaInicial == null)
     {
-      $stmt = App\venta::where('id_almacen',$almacen)->orderBy('id_venta');
+      $stmt = App\venta::where('id_almacen',$almacen)->orderBy('id_venta')->get();
      
       return $stmt;		
     }
     else if($fechaInicial == $fechaFinal)
     {
       $stmt = App\venta::where('id_almacen',$almacen)->like('fecha','like','%',$fechaFinal,'%');
-     
+      
       return $stmt;	  
     }
     else
     {
-      $fechaFinal = new DateTime();
-      $fechaFinal->add(new DateInterval('P1D'));
-      $fechaFinal2 = $fechaFinal->format('Y-m-d');
-      $stmt =App\venta::where('id_almacen', $almacen)->whereBetween('fecha',[$fechaInicial,$fechaFinal2]);
+      // $fechaFinal = new DateTime();
+      // $fechaFinal->add(new DateInterval('P1D'));
+      // $fechaFinal2 = $fechaFinal->format('Y-m-d');
+      $stmt =App\venta::where('id_almacen', $almacen)->whereBetween('fecha',[$fechaInicial,$fechaFinal])->get();
        
      
       return $stmt;	

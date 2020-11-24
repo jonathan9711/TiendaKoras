@@ -1,9 +1,24 @@
 @extends('plantilla.plantilla')
 
 @section('contenido')
-    <!-- Product Detail -->
-    <form action="" method="" name="datos">
+
+    <!-- Product Detail action="{{url('/producto/agregar-producto-carrito')}}"-->
+
         <div class="container bgwhite p-t-35 p-b-80">
+        <div class="btn-group">
+                                            
+            <script type="text/javascript">
+
+            function volver()
+            {
+                window.location = "/";
+            }
+
+            </script>
+
+            <button class="btn btn-danger" onclick="volver()"><i class="fa fa-fw fa-arrow-circle-left"></i>Seguir Comprando</button>
+
+        </div>
             @foreach($productos as $producto)
                 <div class="flex-w flex-sb">
                     <div class="w-size13 p-t-30 respon5">
@@ -22,16 +37,23 @@
 
                     <div class="w-size14 p-t-30 respon5">
                         <h4 class="product-detail-name m-text16 p-b-13">
-                            {{$producto->nombre}}
+                            {{$producto->nombre}} ${{$producto->precio_venta}}
                         </h4>
-
+                        <input type="hidden" class="block2-name dis-block s-text3 p-b-5" value="{{$producto->nombre}}"></input>
+                        <input type="hidden" class="block2-name dis-block s-text3 p-b-5" name='idproduct' id="idproduct" value="{{$producto->id_producto}}"></input>
+						
                         <span class="m-text17">
-                            
+                        <!-- <p class="error" style="color:white;">{{ $errors->first('size')}} </p> -->
+                        <p id="Errores" class="error" style="color:red;">{{ $errors->first()}} </p>
                         </span>
 
-                        <!--  -->
-                        <div class="p-t-33 p-b-60">
+                        <!--  --> 
+                        
+                        <div class="p-t-33 p-b-60 contenido_tallas">
+                            @foreach($categoriaProducto as $categoria)
+                            <input type="hidden" class="block2-name dis-block s-text3 p-b-5" name='categoria' value="{{$categoria->categoria}}"></input>
 
+                             @if($categoria->categoria!="Accesorios")
                             <div class="flex-m flex-w p-b-10">
                            
                                 <div class="s-text15 w-size15 t-center">
@@ -41,306 +63,49 @@
                                 <div class="rs2-select2 rs3-select2 bo4 of-hidden w-size16">
                                     <select class="selection-2" id="tallapais" name="tallapais" onChange="opcionesTalla()">
                                         <option value="">Elija una Opción</option>
-                                         @foreach($categoriaProducto as $categoria)
-                                            
-                                            @if($categoria->categoria=="Botas para caballero" ||$categoria->categoria=="Botas para Caballero" || $categoria->categoria=="Botas para Damas" ||$categoria->categoria=="Botas para damas"
-                                            || $categoria->categoria=="Botas para Niños" ||$categoria->categoria=="Botas para niños")
-                                                <option value="MXN_sombrero">MXN Sombreros, Gorras</option>
-                                                <option value="USA_sombrero">USA Sombreros, Gorras</option>
+                                        
+                                        
+                                           
+                                                @if($categoria->categoria=="Botas para caballero" ||$categoria->categoria=="Botas para Caballero" || $categoria->categoria=="Botas para Damas" ||$categoria->categoria=="Botas para damas"
+                                                || $categoria->categoria=="Botas para Niños" ||$categoria->categoria=="Botas para niños")
+                                                    <option value="MXN_{{$categoria->categoria}}">MXN Calzado</option>
+                                                    <option value="USA_{{$categoria->categoria}}">USA Calzado</option>
 
-                                            @elseif($categoria->categoria=="Sombreros" || $categoria->categoria=="sombreros" || $categoria->categoria=="Texanas" || $categoria->categoria=="texanas"
-                                            || $categoria->categoria=="Gorras" || $categoria->categoria=="gorras")
-                                                <option value="MXN_sombrero">MXN Sombreros, Gorras</option>
-                                                <option value="USA_sombrero">USA Sombreros, Gorras</option>
+                                                @elseif($categoria->categoria=="Sombreros" || $categoria->categoria=="sombreros" || $categoria->categoria=="Texanas" || $categoria->categoria=="texanas"
+                                                || $categoria->categoria=="Gorras" || $categoria->categoria=="gorras")
+                                                    <option value="MXN_sombrero">MXN Sombreros, Gorras</option>
+                                                    <option value="USA_sombrero">USA Sombreros, Gorras</option>
 
-                                            @elseif($categoria->categoria!="Sombreros" && $categoria->categoria!="sombreros" && $categoria->categoria!="Texanas" && $categoria->categoria!="texanas"
-                                            && $categoria->categoria!="Gorras" && $categoria->categoria!="gorras")
-                                                <option value="MXN">MXN</option>
-                                                <option value="USA">USA</option>
+                                                @elseif($categoria->categoria!="Sombreros" && $categoria->categoria!="sombreros" && $categoria->categoria!="Texanas" && $categoria->categoria!="texanas"
+                                                && $categoria->categoria!="Gorras" && $categoria->categoria!="gorras")
+                                                    <option value="MXN">MXN</option>
+                                                    <option value="USA">USA</option>
                                             
-                                            @endif
-                                        @endforeach 
+                                                @endif
+                                            
+                                       
                                     </select>
-                                   
                                 </div>
                             </div>
                            <!-- talla generica mexicana -->
-                            <div class="flex-m flex-w p-b-10" id="USA"> 
-                                @if($producto->id_categoria)
-                                    <div class="s-text15 w-size15 t-center">
-                                        Talla USA
+                            <div class="flex-m flex-w p-b-10" id=""> 
+                               
+                                    <div class="s-text15 w-size15 t-center textoTalla">
+                                        Talla
                                     </div>
 
                                     <div class="rs2-select2 rs3-select2 bo4 of-hidden w-size16">
-                                        <select class="selection-2" name="size">
-                                            <option value="">Elija una Opción</option>
-                                            <option value="S">Small S</option>
-                                            <option value="M">Medium M</option>
-                                            <option value="L">Large L</option>
-                                            <option value="XL">XL Large</option>
+                                        <select class="selection-2 talla_size" id="talla" name="size">
+                                            <option value="">Elija una Opción de talla primero</option>
+                                                                                        
                                         </select>
-                                    </div>
-                                @endif 
-                            </div>
-
-                            <!-- talla generica americana -->
-                            <div class="flex-m flex-w p-b-10" id="MXN" name="MXN"> 
-                                @if($producto->id_categoria)
-                                    <div class="s-text15 w-size15 t-center">
-                                        Talla MXN
-                                    </div>
-
-                                    <div class="rs2-select2 rs3-select2 bo4 of-hidden w-size16">
-                                        <select class="selection-2" name="size">
-                                            <option value="">Elija una Opción</option>
-                                            <option value="S">Chico S</option>
-                                            <option value="M">Mediano M</option>
-                                            <option value="L">Grande L</option>
-                                            <option value="XL">Grande XL</option>
-                                        </select>
-                                    </div>
-                                @endif 
-                            </div>
-
-                            <!-- tallas de sombreros mexicana -->
-                            @foreach($categoriaProducto as $categoria)
-                                @if($categoria->categoria=="Sombreros" || $categoria->categoria=="sombreros" || $categoria->categoria=="Texanas" || $categoria->categoria=="texanas"
-                                || $categoria->categoria=="Gorras" || $categoria->categoria=="gorras")
-                                    <!-- tallas de sombreros mexicana -->
-                                    <div class="flex-m flex-w p-b-10" id="MXN_som"  name="MXN_som"> 
-                                    
-                                            <div class="s-text15 w-size15 t-center">
-                                                Talla MXN
-                                            </div>
-
-                                            <div class="rs2-select2 rs3-select2 bo4 of-hidden w-size16">
-                                                <select class="selection-2" name="size">
-                                                    <option value="0">Elija una Opción</option>
-                                                    <option value="60">60</option>
-                                                    <option value="59">59</option>
-                                                    <option value="58">58</option>
-                                                    <option value="57">57</option>
-                                                    <option value="56">56</option>
-                                                    <option value="55">55</option>
-                                                    <option value="54">54</option>
-                                                    <option value="53">53</option>
-                                                </select>
-                                            </div>
-                                    
-                                    </div>
-                                    <!-- tallas de sombreros americana -->
-                                    <div class="flex-m flex-w p-b-10" id="USA_som"  name="USA_som"> 
-                                
-                                        <div class="s-text15 w-size15 t-center">
-                                            Talla USA
-                                        </div>
-
-                                        <div class="rs2-select2 rs3-select2 bo4 of-hidden w-size16">
-                                            <select class="selection-2" name="size">
-                                                <option value="0">Elija una Opción</option>
-                                                <option value="7 1/2">7 1/2</option>
-                                                <option value="7 3/8">7 3/8</option>
-                                                <option value="7 1/4">7 1/4</option>
-                                                <option value="7 1/8">7 1/8</option>
-                                                <option value="7">7</option>
-                                                <option value="6 7/8">6 7/8</option>
-                                                <option value="6 3/4">6 3/4</option>
-                                                <option value="6 5/8">6 5/8</option>
-                                            </select>
-                                        </div>
                                     </div>
                                
-                                @endif
-                            @endforeach
-
-                            @foreach($categoriaProducto as $categoria)
-                                @if($categoria->categoria=="Botas para caballero"|| $categoria->categoria=="Botas para Caballero" || $categoria->categoria=="botas para caballero")
-                                    <!-- tallas de calzado hombre mexicana -->
-                                    <div class="flex-m flex-w p-b-10" id="MXN_zap"  name="MXN_zap"> 
-                                    
-                                            <div class="s-text15 w-size15 t-center">
-                                                Talla Calzado MXN
-                                            </div>
-
-                                            <div class="rs2-select2 rs3-select2 bo4 of-hidden w-size16">
-                                                <select class="selection-2" name="size">
-                                                    <option value="0">Elija una Opción</option>
-                                                    <option value="30">30</option>
-                                                    <option value="29.5">29.5</option>
-                                                    <option value="29">29</option>
-                                                    <option value="28.5">28.5</option>
-                                                    <option value="28">28</option>
-                                                    <option value="27.5">27.5</option>
-                                                    <option value="27">27</option>
-                                                    <option value="26.5">26.5</option>
-                                                    <option value="26">26</option>
-                                                    <option value="25.5">25.5</option>
-                                                    <option value="25">25</option>
-                                                </select>
-                                            </div>
-                                    
-                                    </div>
-                                    <!-- tallas de sombreros hombre americana -->
-                                    <div class="flex-m flex-w p-b-10" id="USA_zap"  name="USA_zap"> 
-                                
-                                        <div class="s-text15 w-size15 t-center">
-                                            Talla Calzado USA
-                                        </div>
-
-                                        <div class="rs2-select2 rs3-select2 bo4 of-hidden w-size16">
-                                            <select class="selection-2" name="size">
-                                                <option value="0">Elija una Opción</option>
-                                                <option value="11">11</option>
-                                                <option value="10.5">10.5</option>
-                                                <option value="10">10</option>
-                                                <option value="9.5">9.5</option>
-                                                <option value="9">9</option>
-                                                <option value="8.5">8.5</option>
-                                                <option value="8">8</option>
-                                                <option value="7.5">7.5</option>
-                                                <option value="7">7</option>
-                                                <option value="6.5">6.5</option>
-                                                <option value="6">6</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                   
-                                @elseif($categoria->categoria=="Botas para Damas" || $categoria->categoria=="Botas para damas"|| $categoria->categoria=="botas para damas")
-                                   <!-- tallas de calzado dama mexicana -->
-                                   <div class="flex-m flex-w p-b-10" id="MXN_zap"  name="MXN_zap"> 
-                                    
-                                        <div class="s-text15 w-size15 t-center">
-                                            Talla Calzado MXN
-                                        </div>
-
-                                        <div class="rs2-select2 rs3-select2 bo4 of-hidden w-size16">
-                                            <select class="selection-2" name="size">
-                                                <option value="0">Elija una Opción</option>                                             
-                                                <option value="27">27</option>
-                                                <option value="26.5">26.5</option>
-                                                <option value="26">26</option>
-                                                <option value="25.5">25.5</option>
-                                                <option value="25">25</option>
-                                                <option value="24.5">24.5</option>
-                                                <option value="24">24</option>
-                                                <option value="23.5">23.5</option>
-                                                <option value="23">23</option>
-                                                <option value="22.5">22.5</option>
-                                                <option value="22">22</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <!-- tallas de sombreros dama americana -->
-                                    <div class="flex-m flex-w p-b-10" id="USA_zap"  name="USA_zap"> 
-                                
-                                        <div class="s-text15 w-size15 t-center">
-                                            Talla Calzado USA
-                                        </div>
-
-                                        <div class="rs2-select2 rs3-select2 bo4 of-hidden w-size16">
-                                            <select class="selection-2" name="size">
-                                                <option value="0">Elija una Opción</option>
-                                                <option value="10">10</option>
-                                                <option value="9.5">9.5</option>
-                                                <option value="9">9</option>
-                                                <option value="8.5">8.5</option>
-                                                <option value="8">8</option>
-                                                <option value="7.5">7.5</option>
-                                                <option value="7">7</option>
-                                                <option value="6.5">6.5</option>
-                                                <option value="6">6</option>
-                                                <option value="5.5">5.5</option>
-                                                <option value="5">5</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                @elseif($categoria->categoria=="Botas para Niños" || $categoria->categoria=="Botas para niños"|| $categoria->categoria=="botas para niños")
-                                    <!-- tallas de calzado niños mexicana -->
-                                    <div class="flex-m flex-w p-b-10" id="MXN_zap"  name="MXN_zap"> 
-                                    
-                                        <div class="s-text15 w-size15 t-center">
-                                            Talla Calzado MXN
-                                        </div>
-
-                                        <div class="rs2-select2 rs3-select2 bo4 of-hidden w-size16">
-                                            <select class="selection-2" name="size">
-                                                <option value="0">Elija una Opción</option>
-                                                <option value="24">24</option>
-                                                <option value="23.5">23.5</option>
-                                                <option value="23">23</option>
-                                                <option value="22.5">22.5</option>
-                                                <option value="22">22</option>                                                                                              
-                                                <option value="21.5">21.5</option>
-                                                <option value="21">21</option>
-                                                <option value="20.5">20.5</option>
-                                                <option value="20">20</option>
-                                                <option value="19.5">19.5</option>
-                                                <option value="19">19</option>
-                                                <option value="18.5">18.5</option>
-                                                <option value="18">18</option>
-                                                <option value="17.5">17.5</option>  
-                                                <option value="17">17</option>
-                                                <option value="16.5">16.5</option>
-                                                <option value="16">16</option>
-                                                <option value="15.5">15.5</option>
-                                                <option value="15">15</option>
-                                                <option value="14.5">14.5</option>
-                                                <option value="14">14</option>
-                                                <option value="13.5">13.5</option>
-                                                <option value="13">13</option>
-                                                <option value="12.5">12.5</option>
-                                                <option value="12">12</option>                                                
-                                                <option value="11.5">11.5</option>
-                                                <option value="11">11</option>
-                                                <option value="10">10</option>
-                                            </select>
-                                        </div>
-                                    
-                                    </div>
-
-                                    <!-- tallas de Calzado niños americana -->
-                                    <div class="flex-m flex-w p-b-10" id="USA_zap"  name="USA_zap"> 
-                                
-                                        <div class="s-text15 w-size15 t-center">
-                                            Talla Calzado USA
-                                        </div>
-
-                                        <div class="rs2-select2 rs3-select2 bo4 of-hidden w-size16">
-                                            <select class="selection-2" name="size">
-                                                <option value="0">Elija una Opción</option>
-                                                <option value="4">4</option>
-                                                <option value="3.5">3.5</option>
-                                                <option value="3">3</option>
-                                                <option value="2.5">2.5</option>
-                                                <option value="2">2</option>
-                                                <option value="1.5">1.5</option>
-                                                <option value="1">1</option>
-                                                <option value="13.5">13.5</option>
-                                                <option value="13">13</option>
-                                                <option value="12.5">12.5</option>
-                                                <option value="12">12</option>
-                                                <option value="11.5">11.5</option>
-                                                <option value="10">10</option>
-                                                <option value="9.5">9.5</option>
-                                                <option value="9">9</option>
-                                                <option value="8.5">8.5</option>
-                                                <option value="8">8</option>
-                                                <option value="7.5">7.5</option>
-                                                <option value="7">7</option>
-                                                <option value="6.5">6.5</option>
-                                                <option value="6">6</option>
-                                                <option value="5.5">5.5 (12.5 mxn)</option>
-                                                <option value="5.5">5.5 (12 mxn)</option>
-                                                <option value="5">5</option>
-                                                <option value="4">4</option>
-                                                <option value="3">3</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                @endif
-                            @endforeach
-
+                            </div>
+                            @endif
+                            @endforeach 
+                 
+                            <!-- contenido tallas -->
                             <div class="flex-r-m flex-w p-t-10">
                                 <div class="w-size16 flex-m flex-w">
                                     <div class="flex-w bo5 of-hidden m-r-22 m-t-10 m-b-10">
@@ -348,22 +113,37 @@
                                             <i class="fs-12 fa fa-minus" aria-hidden="true"></i>
                                         </button>
 
-                                        <input class="size8 m-text18 t-center num-product" type="number" name="num-product" value="1">
+                                        <input class="size8 m-text18 t-center num-product" type="number" id="cantidad" name="cantidad" value="1">
 
                                         <button class="btn-num-product-up color1 flex-c-m size7 bg8 eff2">
                                             <i class="fs-12 fa fa-plus" aria-hidden="true"></i>
                                         </button>
                                     </div>
+                                   
 
-                                    <div class="btn-addcart-product-detail size9 trans-0-4 m-t-10 m-b-10">
+                                </div>
+                                
+                                <div class="w-size16 flex-m flex-w">
+                                   
+                                    <div class="btn-addcart size9  size9 trans-0-4 m-t-10 m-b-10 añadircarrito">
                                         <!-- Button -->
-                                        <button class="flex-c-m size1 bg4 bo-rad-23 hov1 s-text1 trans-0-4">
+                                        <button  class="flex-c-m size1 bg4 bo-rad-23 hov1 s-text1 trans-0-4 addtoCart" value="{{$producto->id_producto}}">
                                                     Añadir al carrito
                                         </button>
+                                        <br>
+                                       
+                                        <!-- <a type="button" href="{{route('inicio')}}"  class="flex-c-m size1 bg4 bo-rad-23 hov1 s-text1 trans-0-4" >
+                                                   Seguir Comprando
+                                        </a> -->
+
+                                       
                                     </div>
                                 </div>
+                                    
                             </div>
                         </div>
+
+                      
 
                         <div class="p-b-45">
                             <!-- <span class="s-text8 m-r-35">SKU: MUG-01</span> -->
@@ -390,7 +170,7 @@
                 </div>
             @endforeach
         </div>
-
+    <!-- </form> -->
         <!-- Relate Product -->
         <section class="relateproduct bgwhite p-t-45 p-b-138">
             <div class="container">
@@ -413,17 +193,23 @@
                                                 <img src="{{asset($todoproducto->imagen)}}" alt="IMG-PRODUCT">
 
                                                 <div class="block2-overlay trans-0-4">
-                                                    <a href="#" class="block2-btn-addwishlist hov-pointer trans-0-4">
+                                                    <!-- <a href="#" class="block2-btn-addwishlist hov-pointer trans-0-4">
                                                         <i class="icon-wishlist icon_heart_alt" aria-hidden="true"></i>
                                                         <i class="icon-wishlist icon_heart dis-none" aria-hidden="true"></i>
-                                                    </a>
+                                                    </a> -->
 
                                                     <div class="block2-btn-addcart w-size1 trans-0-4">
-                                                        <!-- Button -->
-                                                        <button class="flex-c-m size1 bg4 bo-rad-23 hov1 s-text1 trans-0-4">
+								
+                                                        <a href="{{url('producto/'.$producto->id_producto.'/detalle')}}" class="flex-c-m size1 bg4 bo-rad-23 hov1 s-text1 trans-0-4" value="{{$producto->id_producto}}">
+                                                            Ver Producto
+                                                        </a>
+                                                    </div>
+                                                    <!-- <div class="block2-btn-addcart w-size1 trans-0-4">
+												
+                                                        <button class="flex-c-m size1 bg4 bo-rad-23 hov1 s-text1 trans-0-4 addtoCart" value="{{$producto->id_producto}}">
                                                             Añadir al carrito
                                                         </button>
-                                                    </div>
+                                                    </div> -->
                                                 </div>
                                             </div>
 
@@ -446,62 +232,377 @@
 
             </div>
         </section>
-    </form>
+    
     
     <div id="dropDownSelect1"></div>
 	<div id="dropDownSelect2"></div>
 
 
+    <div class="modal fade" id="create">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>×</span>
+                </button>
+                <h4>Crear</h4>
+            </div>
+            <div class="modal-body">
+            <div class="form-group">
+
+            <label for="ccnum">Number</label>
+
+            <input type="text" name="ccnum" id="ccnum" class="form-control">
+
+            </div>
+
+            <div class="form-group">
+
+            <label for="expiry">Expiry</label>
+
+            <input type="text" name="expiry" id="expiry" class="form-control">
+
+            </div>
+
+            <div class="form-group">
+
+            <label for="cvc">CVC</label>
+
+            <input type="text" name="cvc" id="cvc" class="form-control">
+
+            </div>
+
+            <div class="form-group">
+
+            <label for="numeric">Numeric</label>
+
+            <input type="text" name="numeric" id="numeric" class="form-control">
+
+            </div>
+            </div>
+            <div class="modal-footer">
+                <input type="submit" class="btn btn-primary" value="Guardar">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
     <script type="text/javascript">
         
+     var pais="";
      
         function opcionesTalla() 
         {
+            var contenido="";
+            $('.error').hide();
+            pais= document.getElementById("tallapais").value;
            
-            var pais= document.getElementById("tallapais").value;
+            // console.log('el pais es: '+pais);
             if(pais=="MXN_sombrero")
             {
-                $('#USA_som').hide();
-                $('#MXN_som').show();
-                $('#USA').hide();
-                $('#MXN').hide();
+                contenido+='<option value="">Elija una Opción</option>';
+                contenido+='<option value="60">60</option>';
+                contenido+='<option value="59">59</option>';
+                contenido+='<option value="58">58</option>';
+                contenido+='<option value="57">57</option>';
+                contenido+='<option value="56">56</option>';
+                contenido+='<option value="55">55</option>';
+                contenido+='<option value="54">54</option>';
+                contenido+='<option value="53">53</option>'; 
+                $('.talla_size').html(contenido);
+                $('.textoTalla').html('Talla MXN');
+                
+                // $('#USA_som').hide();
+                // $('#MXN_som').show();
+                // $('#USA').hide();
+                // $('#MXN').hide();
 
             }else if(pais=="USA_sombrero")
             {
-                $('#USA_som').show();
-                $('#MXN_som').hide();
+                contenido+='<option value="">Elija una Opción</option>'
+                contenido+='<option value="7 1/2">7 1/2</option>'
+                contenido+='<option value="7 3/8">7 3/8</option>'
+                contenido+='<option value="7 1/4">7 1/4</option>'
+                contenido+='<option value="7 1/8">7 1/8</option>'
+                contenido+='<option value="7">7</option>'
+                contenido+='<option value="6 7/8">6 7/8</option>'
+                contenido+='<option value="6 3/4">6 3/4</option>'
+                contenido+='<option value="6 5/8">6 5/8</option>'
+                $('.talla_size').html(contenido);
+                $('.textoTalla').html('Talla USA');
+                // $('#USA_som').show();
+                // $('#MXN_som').hide();
              
 
             }else if(pais=="MXN")
             {
-                $('#USA').hide();
-                $('#MXN').show();
+                contenido+='<option value="">Elija una Opción</option>';
+                contenido+='<option value="S">Chico S</option>';
+                contenido+='<option value="M">Mediano M</option>';
+                contenido+='<option value="L">Grande L</option>';
+                contenido+='<option value="XL">Grande XL</option>';
+                $('.talla_size').html(contenido);
+                $('.textoTalla').html('Talla MXN');
+                // $('#USA').hide();
+                // $('#MXN').show();
 
             }else if(pais=="USA")
-            {
-                $('#USA').show();
-                $('#MXN').hide();
+            {   
+                contenido+='<option value="">Elija una Opción</option>';
+                contenido+='<option value="S">Small S</option>';
+                contenido+='<option value="M">Medium M</option>';
+                contenido+='<option value="L">Large L</option>';
+                contenido+='<option value="XL">XL Large</option>';
+                $('.talla_size').html(contenido);
+                $('.textoTalla').html('Talla USA');
+                // $('#USA').show();
+                // $('#MXN').hide();
               
-            }else if(pais=="MXN_calzado")
+            }else if(pais=="MXN_Botas para caballero")
             {
-                $('#USA_zap').hide();
-                $('#MXN_zap').show();
-            }else if(pais=="USA_calzado")
+                contenido+='<option value="">Elija una Opción</option>'
+                contenido+='<option value="30">30</option>'
+                contenido+='<option value="29.5">29.5</option>'
+                contenido+='<option value="29">29</option>'
+                contenido+='<option value="28.5">28.5</option>'
+                contenido+='<option value="28">28</option>'
+                contenido+='<option value="27.5">27.5</option>'
+                contenido+='<option value="27">27</option>'
+                contenido+='<option value="26.5">26.5</option>'
+                contenido+='<option value="26">26</option>'
+                contenido+='<option value="25.5">25.5</option>'
+                contenido+='<option value="25">25</option>'
+                $('.talla_size').html(contenido);
+                $('.textoTalla').html('Talla MXN');
+                // $('#USA_zap').hide();
+                // $('#MXN_zap').show();
+            }else if(pais=="USA_Botas para caballero")
             {
-                $('#USA_zap').show();
-                $('#MXN_zap').hide();
-            }else if(pais=="")
+                contenido+='<option value="">Elija una Opción</option>'
+                contenido+='<option value="11">11</option>'
+                contenido+='<option value="10.5">10.5</option>'
+               contenido+='<option value="10">10</option>'
+                contenido+='<option value="9.5">9.5</option>'
+                contenido+='<option value="9">9</option>'
+                contenido+='<option value="8.5">8.5</option>'
+                contenido+='<option value="8">8</option>'
+                contenido+='<option value="7.5">7.5</option>'
+                contenido+='<option value="7">7</option>'
+                contenido+='<option value="6.5">6.5</option>'
+                contenido+='<option value="6">6</option>'
+                $('.talla_size').html(contenido);
+                $('.textoTalla').html('Talla USA');
+                // $('#USA_zap').show();
+                // $('#MXN_zap').hide();
+            }else if(pais=="MXN_Botas para damas")
             {
-                $('#USA').hide();
-                $('#MXN').hide();
-                $('#USA_som').hide();
-                $('#MXN_som').hide();
-                $('#USA_zap').hide();
-                $('#MXN_zap').hide();
+                contenido+='<option value="">Elija una Opción</option>  '                                           
+                contenido+='<option value="27">27</option>'
+                contenido+='<option value="26.5">26.5</option>'
+                contenido+='<option value="26">26</option>'
+                contenido+='<option value="25.5">25.5</option>'
+                contenido+='<option value="25">25</option>'
+                contenido+='<option value="24.5">24.5</option>'
+                contenido+='<option value="24">24</option>'
+                contenido+='<option value="23.5">23.5</option>'
+                contenido+='<option value="23">23</option>'
+                contenido+='<option value="22.5">22.5</option>'
+                contenido+='<option value="22">22</option>'
+                $('.talla_size').html(contenido);
+                $('.textoTalla').html('Talla MXN');
+            }else if(pais=="USA_Botas para damas")
+            {
+                contenido+='<option value="">Elija una Opción</option>'
+                contenido+='<option value="10">10</option>'
+                contenido+='<option value="9.5">9.5</option>'
+                contenido+='<option value="9">9</option>'
+                contenido+='<option value="8.5">8.5</option>'
+                contenido+='<option value="8">8</option>'
+                contenido+='<option value="7.5">7.5</option>'
+                contenido+='<option value="7">7</option>'
+                contenido+='<option value="6.5">6.5</option>'
+                contenido+='<option value="6">6</option>'
+                contenido+='<option value="5.5">5.5</option>'
+                contenido+='<option value="5">5</option>'
+                $('.talla_size').html(contenido);
+                $('.textoTalla').html('Talla USA');
+            }else if(pais=="MXN_Botas para niños")
+            {
+                contenido+='<option value="">Elija una Opción</option>'
+                contenido+='<option value="24">24</option>'
+                contenido+='<option value="23.5">23.5</option>'
+                contenido+='<option value="23">23</option>'
+                contenido+='<option value="22.5">22.5</option>'
+                contenido+='<option value="22">22</option>    '                                                                                          
+                contenido+='<option value="21.5">21.5</option>'
+                contenido+='<option value="21">21</option>'
+                contenido+='<option value="20.5">20.5</option>'
+                contenido+='<option value="20">20</option>'
+                contenido+='<option value="19.5">19.5</option>'
+                contenido+='<option value="19">19</option>'
+                contenido+='<option value="18.5">18.5</option>'
+                contenido+='<option value="18">18</option>'
+                contenido+='<option value="17.5">17.5</option> ' 
+                contenido+='<option value="17">17</option>'
+                contenido+='<option value="16.5">16.5</option>'
+                contenido+='<option value="16">16</option>'
+                contenido+='<option value="15.5">15.5</option>'
+                contenido+='<option value="15">15</option>'
+                contenido+='<option value="14.5">14.5</option>'
+                contenido+='<option value="14">14</option>'
+                contenido+='<option value="13.5">13.5</option>'
+                contenido+='<option value="13">13</option>'
+                contenido+='<option value="12.5">12.5</option>'
+                contenido+='<option value="12">12</option>   '                                             
+                contenido+='<option value="11.5">11.5</option>'
+                contenido+='<option value="11">11</option>'
+                contenido+='<option value="10">10</option>'
+                $('.talla_size').html(contenido);
+                $('.textoTalla').html('Talla MXN');
+            }else if(pais=="USA_Botas para niños")
+            {
+                contenido+='<option value="">Elija una Opción</option>'
+                contenido+='<option value="4">4</option>'
+                contenido+='<option value="3.5">3.5</option>'
+                contenido+='<option value="3">3</option>'
+                contenido+='<option value="2.5">2.5</option>'
+                contenido+='<option value="2">2</option>'
+                contenido+='<option value="1.5">1.5</option>'
+                contenido+='<option value="1">1</option>'
+                contenido+='<option value="13.5">13.5</option>'
+                contenido+='<option value="13">13</option>'
+                contenido+='<option value="12.5">12.5</option>'
+                contenido+='<option value="12">12</option>'
+                contenido+='<option value="11.5">11.5</option>'
+                contenido+='<option value="10">10</option>'
+                contenido+='<option value="9.5">9.5</option>'
+                contenido+='<option value="9">9</option>'
+                contenido+='<option value="8.5">8.5</option>'
+                contenido+='<option value="8">8</option>'
+                contenido+='<option value="7.5">7.5</option>'
+                contenido+='<option value="7">7</option>'
+                contenido+='<option value="6.5">6.5</option>'
+                contenido+='<option value="6">6</option>'
+                contenido+='<option value="5.5">5.5 (12.5 mxn)</option>'
+                contenido+='<option value="5.5">5.5 (12 mxn)</option>'
+                contenido+='<option value="5">5</option>'
+                contenido+='<option value="4">4</option>'
+                contenido+='<option value="3">3</option>'
+                $('.talla_size').html(contenido);
+                $('.textoTalla').html('Talla USA');
             }
 
         }
 
+        $('.añadircarrito').on('click',function(){
+            tallapais= $("#tallapais").val();
+            // console.log("la talla del pais: "+tallapais);
+            
+                // var size=$('.talla_size').change(function(event){
+                //    alert(this.value);
+                // });
+                
+                // alert(size);
+                var nombre=$('.w-size14').parent().find('.block2-name').val();
+                var id=$(this).find('.addtoCart').val();
+                var cantidad=$('#cantidad').val();
+                var talla=$('#talla').val();
+                var tipo=$('#tallapais').val();
+                var datos  = new FormData();
+                    datos.append("idproduct",id);
+                    datos.append("cantidad",cantidad);
+                    datos.append("size",talla);
+                    datos.append("tallapais",tipo);
+                if(talla==''||tipo==''){
+                    $('#Errores').html("Las Tallas Son Requeridas");
+                }else{                   
+                    // console.log(datos);
+                   
+                        $.ajax({
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            url:"/producto/agregar-producto-carrito",
+                            method:"POST",
+                            data: datos,
+                            cache:false,
+                            contentType:false,
+                            processData:false,
+                            dataType:"json",
+                            success:function(respuesta)
+                            {
+                                if(respuesta===3){
+                                    swal('Error', "¡Ha superado la cantidad existente del producto!", "error").then((value) => {
+                                    clearTimeout(3000);
+                                    // window.location.reload();
+                                    });
+                                }else if(respuesta===1){                                   
+                                    swal(nombre, "¡Se ha agregado al carrito!", "success").then((value) => {
+                                        clearTimeout(3000);
+                                        window.location.reload();
+                                    });
+                                
+                                }else{
+                                    
+                                    swal('Lo sentimos', "¡inicie sesion para agregar productos al carrito!", "error");
+                                }
+                            }
+                        })
+                        // swal(nameProduct, "¡Se ha agregado al carrito!", "success");
+                        
+
+                     
+                }
+                
+            // }else{
+            //     $(this).on('click', function(){
+            //         swal('Lo sentimos', "¡elija una talla para añadir al carrito!", "error");
+			//     });
+                
+            // }
+            
+		});
+
+        $('.btn-num-product-up').on('click',function(){
+            var cantidad=$('#cantidad').val();
+            cantidad++;
+            var id=$('#idproduct').val();
+            var datos  = new FormData();
+            datos.append("cantidad",cantidad);
+            datos.append("id",id);
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url:"/ajax/producto/cantidad-exitencia",
+                method:"POST",
+                data: datos,
+                cache:false,
+                contentType:false,
+                processData:false,
+                dataType:"json",
+                success:function(respuesta)
+                {
+                    
+                    if(respuesta==0){                                   
+                    swal('Error', "¡Ha superado la cantidad existente del producto!", "error").then((value) => {
+                        clearTimeout(3000);
+                        // window.location.reload();
+                    });
+                    
+                    }
+                }
+            })
+        });
+
+
+
     </script>
 
 @endsection
+
+
+
+   

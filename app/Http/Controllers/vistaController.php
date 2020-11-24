@@ -18,8 +18,17 @@ class vistaController extends Controller
     {
         $categoriaProducto="";
         $categorias = categorias::all();
-        $productos = producto::all();
+        $productos = producto::paginate(16);
         return view('tienda.index',compact('productos','categorias','categoriaProducto'));
+    }
+
+
+    public function perfilCliente()
+    {
+        $categoriaProducto="";
+        $categorias = categorias::all();
+        $productos = producto::paginate(16);
+        return view('tienda.perfil_cliente',compact('productos','categorias','categoriaProducto'));
     }
 
     public function Rango_fechas(Request $request)
@@ -29,6 +38,9 @@ class vistaController extends Controller
         $fechaFinal;
         $almacen;
         return ctrRangoFechasVentas($fechaInicial, $fechaFinal,$almacen);
+    }
+    public function pagos(){
+        return view('tienda.pagos');
     }
 
 }

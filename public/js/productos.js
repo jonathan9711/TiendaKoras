@@ -46,6 +46,8 @@ $("#nuevoPrecioCompra").change(function()
 
 })
 
+
+
 $("#precioCompra").change(function()
 {
 	if ($(".porcentaje").prop("checked"))

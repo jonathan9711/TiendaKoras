@@ -12,7 +12,12 @@ class InicioController extends Controller
 	public function index()
 	{
 		return view('admin.inicio');
-	}
+    }
+    
+    public function cerrar_sesion()
+    {
+
+    }
     public function edit($id)
     {
     }

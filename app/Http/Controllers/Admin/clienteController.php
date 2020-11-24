@@ -2,16 +2,19 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Carrito;
 use App\Http\Controllers\Controller;
 use App\cliente;
 use App\categorias;
+use App\ordenes;
 use App\producto;
 use Dotenv\Store\File\Reader;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Session;
-use Illuminate\Support\Facades\Auth;
+use Auth;
+use Illuminate\Validation\Rule as ValidationRule;
 
 class clienteController extends Controller
 {
@@ -101,33 +104,40 @@ class clienteController extends Controller
         $logeo=request()->all();
         $logeo=request()->except('_token');
 
-        $user = DB::table('cliente')->where('email', $logeo['email'])->get();
+        $user = cliente::where('email', $logeo['email'])->get();
+       
         if($user->isEmpty())
         {
             //si no esta el usuario al no ser encontrado devuelve que no se encontro
           return back()->withErrors(['email' => 'Usuario no encontrado']);
-        }else
+        }
+        else
         {
-    
-             if(Hash::check($logeo['password'], $user[0]->password)){
-                 $userData = DB::table('cliente')->where('email', $logeo['email'])->get();
-                 session(["cliente"=>$userData[0]]);
-
-                 $categorias = categorias::all();
-                 $productos = producto::all();
-                 return redirect('/')->with("data",$userData,$categorias,$productos);
-             }else{
-                 return back()->withErrors(['password' => 'Contraseña incorrecta']);
-             }   
+            if (Auth::guard('cliente')->attempt(['email' => $logeo['email'], 'password' => $logeo['password']],$request->get('remember-me', 0)))
+            {
+                // dd(Auth::guard('cliente'));
+                Carrito::insert([
+                    "id_cliente"=>$user[0]['id_cliente'],
+                    "productos"=>'vacio'
+                ]);
+                $categoriaProducto=null;
+                $categorias = categorias::all();
+                $productos = producto::paginate(6);
+                return view('tienda.index',compact('categorias','categoriaProducto','productos'));
+                // return redirect()->route('admin.inicio');
+            }else{
+                return back()->withErrors(['password' => 'Los datos no coinciden con nuestros registros']);
+            }  
         }
     }
 
     public function logout()
-    {
-        session(["cliente"=>null]);
-        //Session::forget('userData');
-        Auth::logout();
-        return redirect(url('/'));   
+    {        
+        Auth::guard('cliente')->logout();
+        session()->flush();
+        session()->regenerate();
+        return redirect()->route('inicio');
+        
     }
 
 // ajax funciones
@@ -286,8 +296,57 @@ class clienteController extends Controller
 		$tabla = "cliente";
 		$respuesta = Cliente::mdlMostrarClientes($tabla,$item,$valor);
 		return $respuesta;
-	}
-	
+    }
+    
+    public function editar_cliente_info(Request $request)
+    {
+        
+        $campos=[
+            'nombre' => 'required|string|max:100',
+            'apellido' => 'required|string|max:100',
+            'direccion' => 'required|string|max:100|min:5',
+            'RFC' => 'required|string|max:1000',
+            'ciudad' => 'required|string|max:100',
+            'email' => 'required|string|max:100|min:10',
+            'telefono' => 'required|string|max:100',
+            'password' =>'string|nullable|min:6',
+        ];
+        
+        $Mensaje=["required"=>'El campo :attribute es requerido'];
+        $this->validate($request,$campos,$Mensaje);  
+       
+        $datosCliente=request()->all();
+        $datosCliente=request()->except('_token');
+        
+        if($datosCliente['password']==null){
+            $clieintepass=cliente::where('id_cliente',$request->id_cliente)->first();
+            $datosCliente['password']=$clieintepass->password;
+        }else{
+             $datosCliente['password']= Hash::make($datosCliente['password']);
+        }
+       
+        // dd($datosCliente);
+         cliente::where('id_cliente','=',$request->id_cliente)->update($datosCliente);
+         session()->flash('messages', 'success|Los datos han sido actualizados correctamente');
+         return redirect()->route('perfil');
+    }
+    
+    public function compras_cliente($id)
+    {
+       $datos=[];
+       $categorias = categorias::all();
+        $compras=ordenes::where('id_cliente',$id)->orderBy('id','desc')->get();
+    //   dd($compras[0]['status']);
+        foreach($compras as $i=>$compra){
+           
+            // $datos=unserialize($compra['carrito']);
+            // $compra['carrito']=unserialize($compra['carrito']);
+             array_push($datos,unserialize($compra['carrito']));
+        } 
+        // dd($compra);
+        //    dd($compras);
+        return view('tienda.compras-cliente',compact('datos','categorias'));
+    }
 	
 
 	public static function ctrBorrarCliente(Request $request)
@@ -310,5 +369,33 @@ class clienteController extends Controller
 				
 			}
 		
-	}
+    }
+    
+    public function asignar_contraseña()
+    {
+        $contraseña="";
+        return view('cliente.darContraseña',compact('contraseña'));
+    }
+
+    public function solicitar_contraseña(Request $request)
+    {
+        // dd($request);
+        $email=$request->email;
+        $RFC= $request->RFC;
+        $cliente=cliente::where('RFC',$RFC)->where('email',$email)->first();
+        if(!$cliente)
+        {
+            session()->flash('messages', 'error|los datos no estan en nuestros registros');
+            return redirect()->back();
+           
+        }else{
+
+            $contraseña=rand(100000,999999);
+            $nuevaContraseña = Hash::make($contraseña);
+        
+            cliente::where('id_cliente','=',$cliente->id_cliente)->update(['password'=>$nuevaContraseña]);
+            // $contraseña="123456789";
+            return view('cliente.darContraseña',compact('contraseña'));
+        }
+    }
 }

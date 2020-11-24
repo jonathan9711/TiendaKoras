@@ -4,23 +4,42 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use \PDO;
 use App\conexion;
-require_once "conexion.php";
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
-class cliente extends Model 
+
+class cliente extends Authenticatable
 {
+	use Notifiable;
+	
+	protected $primaryKey='id_cliente';
 
-    protected $table = 'cliente';
+    protected $fillable=[		
+		'nombre', 
+		'apellido',
+		'direccion', 
+		'RFC', 
+		'ciudad', 
+		'email', 
+		'password', 
+		'telefono',
+		'compras',
+		'ultima_compra'
+	];
+	
+	protected $table = 'cliente';
 
-    protected $fillable=[
-        'nombre', 'apellido','direccion', 'RFC', 'ciudad', 'email', 'password', 'telefono'
-    ];
     public function apartados(){
         return $this->hasMany(apartado::class);
     }
 
     public function venta(){
         return $this->hasMany(venta::class);
-    }
+	}
+	
+	public function Carrito(){
+		return $this->hasMany('App\Carrito');
+	}
     ///admin
     // static public function mdlCrearCliente($tabla,$datos)
 	// {

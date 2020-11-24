@@ -49,10 +49,19 @@ class HomeController extends Controller
     {
         $idcategoria="";
         $categorias = categorias::all();
-        $productos = producto::where('id_categoria','=',$id)->get();
-        foreach($productos as $prod){
-            $idcategoria=$prod->id_categoria;
+       
+        if($productos = producto::where('id_categoria','=',$id)->first()!=null){
+            $productos = producto::where('id_categoria','=',$id)->get()->take(16); 
+            foreach($productos as $prod){
+                $idcategoria=$prod->id_categoria;
+            }
+        }else{
+            $productos=null;
+            $idcategoria=null;
         }
+       
+        
+       
         $categoriaProducto= categorias::where('id','=',$idcategoria)->get();
 
         return view('tienda.index',compact('productos','categorias','categoriaProducto'));
@@ -73,10 +82,97 @@ class HomeController extends Controller
         return view('tienda.contactanos',compact('categorias'));
     }
 
-    public function productos()
+    public function productos(Request $request)
     {
+         
         $categorias = categorias::all();
         $productos = producto::all();
+        if($request->ajax()){
+            return response()->json(view('tienda.productos-paginados',compact('productos'))->render());
+        }
         return view('tienda.productos',compact('productos','categorias'));
     }
+
+    public function productos_filtrado(Request $request)
+    {
+        //  dd($request);
+        $precio=$request->precio;
+        $nombre=$request->texto;
+        if($precio==0 && $nombre=="nada"){
+            $productos= producto::all();
+        }else if($precio==0 && $nombre!="nada"){
+            $productos    =   producto::where("nombre",'like','%'.$nombre."%")->get();
+        }else
+        if($nombre=="nada" && $precio!=0){
+            $productos = producto::whereBetween('precio_venta',[0,$precio])->get();
+        }else if($precio==2000 && $nombre=="nada"){
+            $productos= producto::all();
+        }
+        else{
+            $productos    =   producto::where("nombre",'like','%'.$nombre."%")->whereBetween('precio_venta',[0,$precio])->get();
+        }
+        // dd($productos);
+        return response()->json(view('tienda.productos-paginados',compact('productos'))->render());
+
+    }
+    public function productos_filtrado_index(Request $request)
+    {
+        //  dd($request);
+        $categoria=$request->categoria;
+        
+        if($categoria=="todo"){
+            $productos= producto::all()->take(16);
+        }else {
+            $productos=producto::where('id_categoria',$categoria)->get()->take(16);
+        }
+            
+        // dd($productos);
+        return response()->json(view('tienda.productos-paginados',compact('productos'))->render());
+
+    }
+
+
+    public function productos_precio(Request $request)
+    {
+         $precio=$request->precio;
+        $categorias = categorias::all();
+        if($precio==0){
+            $productos = producto::all();
+        }else{
+            $productos = producto::whereBetween('precio_venta',[0,$precio])->get();
+        }
+        if($request->ajax()){
+            return response()->json(view('tienda.productos-paginados',compact('productos'))->render());
+        }
+        return view('tienda.productos',compact('productos','categorias'));
+    }
+
+    public function buscador(Request $request)
+    {
+        // dd($request);
+        $productos    =   producto::where("nombre",'like','%'.$request->texto."%")->get();
+        // dd($productos);
+        return response()->json(view("tienda.productos-paginados",compact("productos"))->render());        
+    }
+
+    public function productos_category(Request $request)
+    {
+        $categoria=$request->categoria;
+        // dd($request);
+       if($categoria=="todo"){
+        $productos = producto::all();
+       }else{
+           $productos = producto::where('id_categoria',$request->categoria)->get();
+       }
+    //    if($request->ajax()){
+    //     return response()->json(view('tienda.productos-paginados',compact('productos'))->render());
+    //     }     
+
+        
+         return response()->json(view("tienda.productos-paginados",compact("productos"))->render());
+    }
+
+
+
+ 
 }

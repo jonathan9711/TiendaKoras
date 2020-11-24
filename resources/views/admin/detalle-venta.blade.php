@@ -58,7 +58,9 @@ use App\usuarios;
 $respuestaVenta;
 
               
-              
+
+
+             
               $fecha = $data[0]["fecha"];
               $productos = json_decode($data[0]["productos"],true);
               $subtotal = number_format($data[0]["subtotal"],2);
@@ -69,6 +71,8 @@ $respuestaVenta;
 
               $itemCliente = "id_cliente";
               $valorCliente = $data[0]["id_cliente"];
+             
+              $metodo_pago= $data[0]["metodo_pago"];
 
               $respuestaCliente = cliente::where($itemCliente, $valorCliente)->get();
 
@@ -183,28 +187,57 @@ $respuestaVenta;
         
           
               <table class ="table" style = "width :100%;font-size:1.5em; ">
-              @foreach($resultado as $prod) 
-                <tr>
-                  
-                  <td style="border: 1px solid #666; color:#333; background-color:white; width:260px; text-align:center">
-                    {{$prod->descripcion}}
-                  </td>
+              @if($data[0]["metodo_pago"]=="card")
+                @foreach($resultado as $prod) 
+                  <tr>
+                    
+                    <td style="border: 1px solid #666; color:#333; background-color:white; width:260px; text-align:center">
+                      @foreach($prod->descripcion as $p)
+                      
+                
+                      {{$prod->nombre}}, {{$p->tipo_talla}}, {{$p->cantidad}} de talla {{$p->talla}},
+                      @endforeach
+                    </td>
 
-                  <td style="border: 1px solid #666; color:#333; background-color:white; width:80px; text-align:center">
-                   {{$prod->cantidad}}
-                  </td>
+                    <td style="border: 1px solid #666; color:#333; background-color:white; width:80px; text-align:center">
+                    {{$prod->cantidad}}
+                    </td>
 
-                  <td style="border: 1px solid #666; color:#333; background-color:white; width:100px; text-align:center">$ 
-                  {{$prod->precio}}
-                  </td>
+                    <td style="border: 1px solid #666; color:#333; background-color:white; width:100px; text-align:center">$ 
+                    {{$prod->precio}}
+                    </td>
 
-                  <td style="border: 1px solid #666; color:#333; background-color:white; width:100px; text-align:center">$ 
-                    {{$prod->total}}
-                  </td>
+                    <td style="border: 1px solid #666; color:#333; background-color:white; width:100px; text-align:center">$ 
+                      {{$prod->cantidad*$prod->precio}}
+                    </td>
 
 
-                </tr>
-              @endforeach
+                  </tr>
+                @endforeach
+              @else
+                @foreach($resultado as $prod) 
+                  <tr>
+                    
+                    <td style="border: 1px solid #666; color:#333; background-color:white; width:260px; text-align:center">
+                      {{$prod->descripcion}}
+                    </td>
+
+                    <td style="border: 1px solid #666; color:#333; background-color:white; width:80px; text-align:center">
+                    {{$prod->cantidad}}
+                    </td>
+
+                    <td style="border: 1px solid #666; color:#333; background-color:white; width:100px; text-align:center">$ 
+                    {{$prod->precio}}
+                    </td>
+
+                    <td style="border: 1px solid #666; color:#333; background-color:white; width:100px; text-align:center">$ 
+                      {{$prod->total}}
+                    </td>
+
+
+                  </tr>
+                @endforeach
+              @endif
               </table>
 
          

@@ -146,6 +146,7 @@ window.onload = function()
     if(localStorage.getItem("almacenActual") == null)
     {
 		var almacenInventario = $('#almacenid').val();
+		$(".tablaInventario").DataTable().clear();
 		mostrarTablaInventario(almacenInventario);
 		
 	}
@@ -153,6 +154,7 @@ window.onload = function()
 	{
 		var almacenStorage = $('#almacenid').val();
 		//$("#almacen").val(almacenStorage);
+		$(".tablaInventario").DataTable().clear();
 		mostrarTablaInventario(almacenStorage);
 	}		
    

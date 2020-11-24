@@ -45,7 +45,7 @@ class InventarioController extends Controller
                     {
                         $existencia = "<button class='btn btn-danger'>".$inv->existencia."</button>";
                     }
-                    else if($inv->existencia > 11 && $inv->existencia <= 15)
+                    else if($inv->existencia >= 11 && $inv->existencia <= 15)
                     {
                         $existencia = "<button class='btn btn-warning'>".$inv->existencia."</button>";
                     }
@@ -128,146 +128,109 @@ class InventarioController extends Controller
     // }
 
     //metodo para entrada de un producto
-    public static function ctrAgregarInventario()
+    public static function ctrAgregarInventario(Request $request)
     {
-        if (isset($_POST["codigoEntrada"]))
+        // dd($request);
+        $datos=request()->all();
+        $datos=request()->except('_token');
+        
+        if (preg_match('/^[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ# ]+$/', $datos["id_productoS"]))
         {
-            if (preg_match('/^[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ# ]+$/', $_POST["id_producto"]))
+            //tablas afectadas
+            $tabla = "inventario";
+            $tabla2 = "movimientos_inventario";
+
+            //variables requeridas
+            $idProducto = $datos["id_productoS"];
+            $almacen = $datos["nuevoAlmacen"];
+            $cantidad = $datos["nuevaCantidad"];
+            $tipo = $datos["tipo"];
+            $usuario = $datos["usuario"];
+            $descripcion = $datos["nuevaEntrada"];
+
+            //sacamos la fecha actual para guardar en movimientos
+            date_default_timezone_set('America/Hermosillo');
+            $fecha = date('Y-m-d');
+            $hora = date('H:i:s');
+
+            //arreglo de datos para las tablas
+            $datos = array("id_producto" => $idProducto, 
+                            "id_almacen" => $almacen,
+                            "cantidad" => $cantidad,
+                            "tipo_movimiento" => $tipo,
+                            "id_usuario" => $usuario,
+                            "descripción" => trim($descripcion),
+                            "hora"=>$hora,
+                            "fecha" => $fecha);
+            $respuestaVerificar = Inventario::where('id_producto',$idProducto)->where('id_almacen',$almacen)->first();
+            // dd($respuestaVerificar);
+                $respuesta2 = Movimientos::insert($datos);
+
+            if($respuesta2)
             {
-                //tablas afectadas
-                $tabla = "inventario";
-                $tabla2 = "movimientos_inventario";
-
-                //variables requeridas
-                $idProducto = $_POST["id_producto"];
-                $almacen = $_POST["nuevoAlmacen"];
-                $cantidad = $_POST["nuevaCantidad"];
-                $tipo = $_POST["tipo"];
-                $usuario = $_SESSION["id"];
-                $descripcion = $_POST["nuevaEntrada"];
-
-                //sacamos la fecha actual para guardar en movimientos
-                date_default_timezone_set('America/Hermosillo');
-               $fecha = date('Y-m-d');
-               $hora = date('H:i:s');
-
-               //arreglo de datos para las tablas
-                $datos = array("id_producto" => $idProducto, 
-                               "id_almacen" => $almacen,
-                                "cantidad" => $cantidad,
-                                "tipo_movimiento" => $tipo,
-                                "id_usuario" => $usuario,
-                                "descripcion" => trim($descripcion),
-                                "hora"=>$hora,
-                                "fecha" => $fecha);
-                $respuestaVerificar = Inventario::mdlVerificarInventario($tabla,$idProducto,$almacen);
-                $respuesta2 = Movimientos::mdlAgregarMovimiento($tabla2,$datos);
-
-                if ($respuestaVerificar==false) 
-                {
-                    $respuesta = Inventario::mdlAgregarInventario($tabla,$datos);
-
-                    if ($respuesta == "ok" && $respuesta2 =="ok")
+                if ($respuestaVerificar) 
+                { 
+                    
+                    $suma = $cantidad + $respuestaVerificar["existencia"];
+                    $respuesta = Inventario::where('id_producto',$idProducto)->where('id_almacen',$almacen)->update(['existencia'=>$suma]);     
+                    // dd($respuesta,$respuesta2);
+                    if ($respuesta)
                     {
-                        echo '<script>
-                        swal({
-                            type: "success",
-                            title: "¡La entrada ah sido exitosa!",
-                            showConfirmButton: true,
-                            confirmButtonText: "cerrar",
-                            closeOnconfirm: false
-                        }).then((result)=>
-                        {
-                           if(result.value)
-                           {
-                               window.location = "inventarios";
-                           }
-                        })
-                        </script>';
+                        session()->flash('messages', 'success|¡La entrada a sido exitosa!');
+                        return redirect()->route('admin.inventario');	                        
                     }
                     else
                     {
-                        echo '<script>
-                        swal({
-                            type: "error",
-                            title: "no se guardo correctamente",
-                            showConfirmButton: true,
-                            confirmButtonText: "cerrar",
-                            closeOnconfirm: false
-                        }).then((result)=>
-                        {
-                           if(result.value)
-                           {
-                               window.location = "inventarios";
-                           }
-                        })
-                        </script>';
+                        session()->flash('messages', 'error|no se guardo correctamente');
+                        return redirect()->back();
                     }
                 }
                 else
                 {
-                    $suma = $cantidad + $respuestaVerificar["existencia"];
-                    $nuevaRespuesta = Inventario::mdlActualizarCantidad($tabla,$suma,$idProducto,$almacen);
+                    $datoNuevo = array("id_producto" => $idProducto, 
+                                "id_almacen" => $almacen,
+                                "existencia" => $cantidad,
+                                "venta" => 0,
+                                "apartado" => 0,
+                                );
+                    $nuevaRespuesta = Inventario::insert($datoNuevo);
 
-                    if ($nuevaRespuesta=="ok" && $respuesta2=="ok")
+                    if ($nuevaRespuesta==1 && $respuesta2==1)
                     {
-                        echo '<script>
-                        swal({
-                            type: "success",
-                            title: "¡La entrada ah sido exitosaaaaa!",
-                            showConfirmButton: true,
-                            confirmButtonText: "cerrar",
-                            closeOnconfirm: false
-                        }).then((result)=>
-                        {
-                           if(result.value)
-                           {
-                               window.location = "inventarios";
-                           }
-                        })
-                        </script>';
+                        session()->flash('messages', 'success|¡La entrada a sido exitosa!');
+                        return redirect()->route('admin.inventarios');
                     }
-
                 }
             }
-            else
-           {
-               echo '<script>
-               swal(
-               {
-                   type: "error",
-                   title: "¡No puede hacer campos vacios!",
-                   showConfirmButton: true,
-                   confirmButtonText: "Cerrar",
-                   closeOnConfirm: false
-               }).then((result)=>
-               {
-                   if(result.value)
-                   {
-                       window.location = "productos";
-                   }
-               });
-               </script>';
-           }
+            
         }
+        else
+        {
+            session()->flash('messages', 'error|¡No puede hacer campos vacios!');
+            return redirect()->back();
+        }
+        
     }
 
     //metodo para salida de producto
-    public static function ctrSalidaProducto()
+    public static function ctrSalidaProducto(Request $request)
     {
+        //dd($request);
+        $datos=request()->all();
+        $datos=request()->except('_token');
         if (isset($_POST["codigoSalida"]))
         {
-            if (preg_match('/^[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ# ]+$/', $_POST["codigoSalida"]))
+            if (preg_match('/^[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ# ]+$/', $datos["codigoSalida"]))
             {
                 //variables
                 $tabla = "inventario";
                 $tabla2 = "movimientos_inventario";
-                $id_productoS = $_POST["id_productoS"];
-                $almacen = $_POST["almacen"];
-                $cantidad = $_POST["cantidad"];
-                $tipo = $_POST["tipo"];
-                $usuario = $_SESSION["id"];
-                $descripcion = $_POST["nuevaSalida"];
+                $id_productoS = $datos["id_producto"];
+                $almacen = $datos["almacen"];
+                $cantidad = $datos["cantidad"];
+                $tipo = $datos["tipo"];
+                $usuario = $datos["usuario"];
+                $descripcion = $datos["nuevaSalida"];
                 //sacamos la fecha actual para guardar en movimientos
                 date_default_timezone_set('America/Hermosillo');
                $fecha = date('Y-m-d');
@@ -278,95 +241,46 @@ class InventarioController extends Controller
                                 "cantidad" => $cantidad,
                                 "tipo_movimiento" => $tipo,
                                 "id_usuario" => $usuario,
-                                "descripcion" => trim($descripcion),
+                                "descripción" => trim($descripcion),
                                 "hora"=>$hora,
                                 "fecha" => $fecha);
 
-                $respuestaVerificar = Inventario::mdlVerificarInventario($tabla,$id_productoS,$almacen);
-                var_dump($respuestaVerificar);
-                if ($respuestaVerificar!=false) 
+                $respuestaVerificar = Inventario::where('id_producto',$id_productoS)->where('id_almacen',$almacen)->get();
+                //dd($respuestaVerificar);
+                if ($respuestaVerificar[0]["existencia"]!=0) 
                 {
-                    if ($cantidad>$respuestaVerificar["existencia"])
+                    if ($cantidad>$respuestaVerificar[0]["existencia"])
                     {
-                        echo '<script>
-                        swal({
-                            type: "error",
-                            title: "La cantidad de salida es mayor a la existencia",
-                            showConfirmButton: true,
-                            confirmButtonText: "cerrar",
-                            closeOnconfirm: false
-                        }).then((result)=>
-                        {
-                           if(result.value)
-                           {
-                               window.location = "inventarios";
-                           }
-                        })
-                        </script>';
+                        session()->flash('messages', 'error|La cantidad de salida es mayor a la existencia');
+                        return redirect()->back();
+                        
                     }
                     else
                     {
-                        $suma = $respuestaVerificar["existencia"] - $cantidad;
-                        $nuevaRespuesta = Inventario::mdlActualizarCantidad($tabla,$suma,$id_productoS,$almacen);
-                        $respuesta2 = Movimientos::mdlAgregarMovimiento($tabla2,$datos);
-                        if ($nuevaRespuesta=="ok" && $respuesta2=="ok")
+                        $suma = $respuestaVerificar[0]["existencia"] - $cantidad;
+                        $nuevaRespuesta = Inventario::where('id_producto',$id_productoS)->where('id_almacen',$almacen)->update(['existencia'=>$suma]);
+                        $respuesta2 = Movimientos::insert($datos);
+                        if ($nuevaRespuesta==1 && $respuesta2==1)
                         {
-                            echo '<script>
-                            swal({
-                                type: "success",
-                                title: "¡La salida ah sido exitosa!",
-                                showConfirmButton: true,
-                                confirmButtonText: "cerrar",
-                                closeOnconfirm: false
-                            }).then((result)=>
-                            {
-                               if(result.value)
-                               {
-                                   window.location = "inventarios";
-                               }
-                            })
-                            </script>';
+                            session()->flash('messages', 'success|¡La salida ah sido exitosa!');
+                            return redirect()->route('admin.inventario');
+                           
                         }
                     }
                     
                 }
                 else
                 {
-                    echo '<script>
-                    swal({
-                        type: "error",
-                        title: "¡No hay existencia de este producto!",
-                        showConfirmButton: true,
-                        confirmButtonText: "cerrar",
-                        closeOnconfirm: false
-                    }).then((result)=>
-                    {
-                       if(result.value)
-                       {
-                           window.location = "inventarios";
-                       }
-                    })
-                    </script>';
+                    session()->flash('messages', 'error|¡No hay existencia de este producto!');
+                    return redirect()->back();
+                    
                 }
             }
             else
            {
-               echo '<script>
-               swal(
-               {
-                   type: "error",
-                   title: "¡No puede haber campos vacios!",
-                   showConfirmButton: true,
-                   confirmButtonText: "Cerrar",
-                   closeOnConfirm: false
-               }).then((result)=>
-               {
-                   if(result.value)
-                   {
-                       window.location = "inventarios";
-                   }
-               });
-               </script>';
+            session()->flash('messages', 'error|¡No puede haber campos vacios!');
+            return redirect()->back();
+            
            }
         }
     }

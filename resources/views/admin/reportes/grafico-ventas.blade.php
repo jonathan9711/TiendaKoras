@@ -6,6 +6,7 @@ error_reporting(0);
 
 if(isset($_GET["fechaInicial"]))
 {
+    
     $fechaInicial = $_GET["fechaInicial"];
     $fechaFinal = $_GET["fechaFinal"];
 }
@@ -32,6 +33,7 @@ foreach ($respuesta as $key => $value)
         $sumaPagosMes[$key] += $value; 
     }
 }
+
 $noRepetirFechas = array_unique($arrayFechas);
 ?>
 
@@ -53,14 +55,14 @@ GRÁFICO DE VENTAS
     <div class="box-body border-radius-none nuevoGraficoVentas">
 
         <div class="chart" id="line-chart-ventas" style="height: 250px;"></div>
-
+       
   </div>
 
 </div>
 
 <script>
     
- var line = new Morris.Line({
+    var line = new Morris.Line({
     element          : 'line-chart-ventas',
     resize           : true,
     data             : [
@@ -72,7 +74,7 @@ GRÁFICO DE VENTAS
         foreach($noRepetirFechas as $key){
 
             echo "{ y: '".$key."', ventas: ".$sumaPagosMes[$key]." },";
-
+          
 
         }
 

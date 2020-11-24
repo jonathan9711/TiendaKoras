@@ -144,7 +144,7 @@
 
                       
                         echo '<select class="form-control input-lg" name="almacen">
-                              <option value="todos" selected>Todos los almacenes</option>';
+                              <option value="" selected>Todos los almacenes</option>';
                         foreach ($almacen as $key => $value)
                         {
                            echo '<option value="'.$value->id_almacen.'">'.$value->nombre.'</option>';

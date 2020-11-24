@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Home 02</title>
+	<title>Tienda </title>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 <!--===============================================================================================-->
@@ -28,17 +28,48 @@
 	<link rel="stylesheet" type="text/css" href="{{asset('vendor/daterangepicker/daterangepicker.css')}}">
 <!--===============================================================================================-->
 	<link rel="stylesheet" type="text/css" href="{{asset('vendor/slick/slick.css')}}">
+	<link rel="stylesheet" type="text/css" href="{{asset('css/modal-perfil.css')}}">
+
+	<link rel="stylesheet" href="{{asset('vistas/dist/css/AdminLTE.css')}}">
+  <link rel="stylesheet" href="{{asset('vistas/dist/css/AdminLTE.min.css')}}">
 <!--===============================================================================================-->
 	<link rel="stylesheet" type="text/css" href="{{asset('vendor/lightbox2/css/lightbox.min.css')}}">
 <!--===============================================================================================-->
 	<link rel="stylesheet" type="text/css" href="{{asset('css/util.css')}}">
 	<link rel="stylesheet" type="text/css" href="{{asset('css/main.css')}}">	
+	<script type="text/javascript" src="{{asset('vendor/jquery/jquery-3.2.1.min.js')}}"></script>
+	<script type="text/javascript" src="{{asset('vendor/jquery/jquery.js')}}"></script>
+	<script type="text/javascript" src="{{asset('vendor/jquery/jquery.min.js')}}"></script>
+	<script type="text/javascript" src="{{asset('vendor/animsition/js/animsition.min.js')}}"></script>
+	<link rel="stylesheet" href="{{asset('vistas/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css')}}">
+  	<link rel="stylesheet" href="{{asset('vistas/bower_components/datatables.net-bs/css/dataTables.bootstrap.css')}}">
+  	<link rel="stylesheet" href="{{asset('vistas/bower_components/datatables.net-bs/css/responsive.bootstrap.min.css')}}">
+  	<script src="{{asset('vistas/bower_components/datatables.net/js/jquery.dataTables.min.js')}}"></script>
+	  <script src="{{asset('vistas/bower_components/datatables.net/js/jquery.dataTables.js')}}"></script>
+	  <script src="{{asset('vistas/plugins/sweetalert2/sweetalert2.all.js')}}"></script>
+	  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBDaeWicvigtP9xPv919E-RNoxfvC-Hqik&callback=google_map"></script>
+	<!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAKFWBqlKAGCeS1rMVoaNlwyayu0e0YRes=google_map"></script> -->
+  	<script src="{{asset('vistas/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js')}}"></script>
+ 	<script src="{{asset('vistas/bower_components/datatables.net-bs/js/dataTables.bootstrap.js')}}"></script>
+  	<script src="{{asset('vistas/bower_components/datatables.net-bs/js/dataTables.responsive.min.js')}}"></script>
+  	<script src="{{asset('vistas/bower_components/datatables.net-bs/js/responsive.bootstrap.min.js')}}"></script>
 <!--===============================================================================================-->
 
 
 </head>
 <body class="animsition">
-	
+<meta name="csrf-token" content="{{ csrf_token() }}" />
+	<?php  
+		                
+		$usuario = Auth::guard("cliente")->user();
+		if(session('cart')){
+			$cantidad=  countCantidad(session('cart'),0);
+		}else{
+			$cantidad=0;
+		}
+		
+		
+	?>
 	<!-- header fixed -->
 	<div class="wrap_header fixed-header2 trans-0-4">
 		<!-- Logo -->
@@ -87,17 +118,18 @@
 					<nav class="menu">
 						<ul class="main_menu">
 							<li>
-								@if(session()->get('cliente')=='')
+								@if($usuario=='')
 									<a href="{{url('/ingresar')}}"><i class="topbar-social-item fa fa-user"></i> Mi Cuenta</a>
 									
 								@else
-									<a href="index.html"><i class="topbar-social-item fa fa-user"></i> {{session()->get('cliente')->nombre}}</a>
+									<a><i class="topbar-social-item fa fa-user"></i> {{$usuario->nombre}}</a>
 								@endif										
 								<ul class="sub_menu">
-									@if(session()->get('cliente')=='')
+									@if($usuario=='')
 										<li><a href="{{url('/ingresar')}}">Ingresar</a></li>
 										<li><a href="{{url('/registrarse')}}">Registrarse</a></li>
 									@else
+										<li><a href="{{url('/perfil')}}">Perfil</a></li>
 										<li><a href="{{url('/CerrarSesion')}}">Cerrar Sesión</a></li>
 									@endif
 								</ul>
@@ -111,79 +143,59 @@
 
 			<div class="header-wrapicon2">
 				<img src="{{asset('images/icons/icon-header-02.png')}}" class="header-icon1 js-show-header-dropdown" alt="ICON">
-				<span class="header-icons-noti">0</span>
+				@if(session('cart'))
+					<span class="header-icons-noti notificacion">{{$cantidad}}
+					</span>
+				@endif
 
 				<!-- Header cart noti -->
 				<div class="header-cart header-dropdown">
 					<ul class="header-cart-wrapitem">
-						<li class="header-cart-item">
+					@if(session('cart'))
+						@foreach(session('cart') as $id=>$producto)
+
+						 <li class="header-cart-item">
 							<div class="header-cart-item-img">
-								<img src="{{asset('images/item-cart-01.jpg')}}" alt="IMG">
+								<img src="{{asset($producto['foto'])}}" alt="IMG">
 							</div>
 
 							<div class="header-cart-item-txt">
 								<a href="#" class="header-cart-item-name">
-									White Shirt With Pleat Detail Back
+									{{$producto['nombre']}} 
 								</a>
 
 								<span class="header-cart-item-info">
-									1 x $19.00
+									{{$producto['cantidad']}} x {{$producto['precio']}}
 								</span>
 							</div>
 						</li>
+						@endforeach
 
+						
+						<div class="header-cart-buttons">
+							<div class="header-cart-wrapbtn">
+								<!-- Button -->
+								<a href="{{url('/carrito')}}" class="flex-c-m size1 bg1 bo-rad-20 hov1 s-text1 trans-0-4">
+									Ver Carrito
+								</a>
+							</div>
+
+						</div>
+						@else
 						<li class="header-cart-item">
-							<div class="header-cart-item-img">
-								<img src="{{asset('images/item-cart-02.jpg')}}" alt="IMG">
-							</div>
-
-							<div class="header-cart-item-txt">
-								<a href="#" class="header-cart-item-name">
-									Converse All Star Hi Black Canvas
-								</a>
-
+							<div class="header-cart-item-txt">						
 								<span class="header-cart-item-info">
-									1 x $39.00
+									No hay productos en el carrito, ingresa a tu cuenta para agregar productos
 								</span>
 							</div>
 						</li>
-
-						<li class="header-cart-item">
-							<div class="header-cart-item-img">
-								<img src="{{asset('images/item-cart-03.jpg')}}" alt="IMG">
-							</div>
-
-							<div class="header-cart-item-txt">
-								<a href="#" class="header-cart-item-name">
-									Nixon Porter Leather Watch In Tan
-								</a>
-
-								<span class="header-cart-item-info">
-									1 x $17.00
-								</span>
-							</div>
-						</li>
+						@endif
 					</ul>
 
-					<div class="header-cart-total">
+					<!-- <div class="header-cart-total">
 						Total: $75.00
-					</div>
+					</div> -->
 
-					<div class="header-cart-buttons">
-						<div class="header-cart-wrapbtn">
-							<!-- Button -->
-							<a href="cart.html" class="flex-c-m size1 bg1 bo-rad-20 hov1 s-text1 trans-0-4">
-								View Cart
-							</a>
-						</div>
-
-						<div class="header-cart-wrapbtn">
-							<!-- Button -->
-							<a href="#" class="flex-c-m size1 bg1 bo-rad-20 hov1 s-text1 trans-0-4">
-								Check Out
-							</a>
-						</div>
-					</div>
 				</div>
 			</div>
 		</div>
@@ -248,17 +260,18 @@
 							<nav class="menu">
 								<ul class="main_menu">
 									<li>
-											@if(session()->get('cliente')=='')
+											@if($usuario=='')
 												<a href="{{url('/ingresar')}}"><i class="topbar-social-item fa fa-user"></i> Mi Cuenta</a>
 											
 											@else
-												<a href="index.html"><i class="topbar-social-item fa fa-user"></i> {{session()->get('cliente')->nombre}}</a>
+												<a><i class="topbar-social-item fa fa-user"></i> {{$usuario->nombre}}</a>
 											@endif										
 											<ul class="sub_menu">
-											@if(session()->get('cliente')=='')
+											@if($usuario=='')
 												<li><a href="{{url('/ingresar')}}">Ingresar</a></li>
 												<li><a href="{{url('/registrarse')}}">Registrarse</a></li>
 											@else
+												<li><a href="{{url('/perfil')}}">Perfil</a></li>
 												<li><a href="{{url('/CerrarSesion')}}">Cerrar Sesión</a></li>
 											@endif
 										</ul>
@@ -271,80 +284,60 @@
 					<span class="linedivide1"></span>
 
 					<div class="header-wrapicon2 m-r-13">
+					
 						<img src="{{asset('images/icons/icon-header-02.png')}}" class="header-icon1 js-show-header-dropdown" alt="ICON">
-						<span class="header-icons-noti">0</span>
-
+						@if(session('cart'))
+						<span class="header-icons-noti notificacion" >{{$cantidad}}</span>
+						@endif
 						<!-- Header cart noti -->
 						<div class="header-cart header-dropdown">
 							<ul class="header-cart-wrapitem">
+							@if(session('cart'))
+							@foreach(session('cart') as $id=>$producto)
+
 								<li class="header-cart-item">
-									<div class="header-cart-item-img">
-										<img src="{{asset('images/item-cart-01.jpg')}}" alt="IMG">
+								<div class="header-cart-item-img">
+									<img src="{{asset($producto['foto'])}}" alt="IMG">
+								</div>
+
+								<div class="header-cart-item-txt">
+									<a href="#" class="header-cart-item-name">
+										{{$producto['nombre']}}
+									</a>
+
+									<span class="header-cart-item-info">
+										{{$producto['cantidad']}} x {{$producto['precio']}}
+									</span>
+								</div>
+								</li>
+								@endforeach
+								<div class="header-cart-buttons">
+									<div class="header-cart-wrapbtn">
+										<!-- Button -->
+										<a href="{{url('/carrito')}}" class="flex-c-m size1 bg1 bo-rad-20 hov1 s-text1 trans-0-4">
+											Ver Carrito
+										</a>
 									</div>
 
-									<div class="header-cart-item-txt">
-										<a href="#" class="header-cart-item-name">
-											White Shirt With Pleat Detail Back
-										</a>
-
+								
+								</div>
+								@else
+								<li class="header-cart-item">
+									<div class="header-cart-item-txt">						
 										<span class="header-cart-item-info">
-											1 x $19.00
+											No hay productos en el carrito, ingresa a tu cuenta para agregar productos
 										</span>
 									</div>
 								</li>
-
-								<li class="header-cart-item">
-									<div class="header-cart-item-img">
-										<img src="{{asset('images/item-cart-02.jpg')}}" alt="IMG">
-									</div>
-
-									<div class="header-cart-item-txt">
-										<a href="#" class="header-cart-item-name">
-											Converse All Star Hi Black Canvas
-										</a>
-
-										<span class="header-cart-item-info">
-											1 x $39.00
-										</span>
-									</div>
-								</li>
-
-								<li class="header-cart-item">
-									<div class="header-cart-item-img">
-										<img src="{{asset('images/item-cart-03.jpg')}}" alt="IMG">
-									</div>
-
-									<div class="header-cart-item-txt">
-										<a href="#" class="header-cart-item-name">
-											Nixon Porter Leather Watch In Tan
-										</a>
-
-										<span class="header-cart-item-info">
-											1 x $17.00
-										</span>
-									</div>
-								</li>
+							@endif
 							</ul>
 
-							<div class="header-cart-total">
+							<!-- <div class="header-cart-total">
 								Total: $75.00
-							</div>
+							</div> -->
 
-							<div class="header-cart-buttons">
-								<div class="header-cart-wrapbtn">
-									<!-- Button -->
-									<a href="cart.html" class="flex-c-m size1 bg1 bo-rad-20 hov1 s-text1 trans-0-4">
-										View Cart
-									</a>
-								</div>
-
-								<div class="header-cart-wrapbtn">
-									<!-- Button -->
-									<a href="#" class="flex-c-m size1 bg1 bo-rad-20 hov1 s-text1 trans-0-4">
-										Check Out
-									</a>
-								</div>
-							</div>
+							
+							
 						</div>
 					</div>
 				</div>
@@ -368,17 +361,19 @@
 							<nav class="menu">
 								<ul class="main_menu">
 									<li>
-											@if(session()->get('cliente')=='')
-												<a href="{{url('/ingresar')}}"><i class="topbar-social-item fa fa-user"></i> Mi Cuenta</a>
+											@if($usuario=='')
+												<a><i class="topbar-social-item fa fa-user"></i> Mi Cuenta</a>
 											
 											@else
-												<a href="index.html"><i class="topbar-social-item fa fa-user"></i> {{session()->get('cliente')->nombre}}</a>
+												<a><i class="topbar-social-item fa fa-user"></i> {{$usuario->nombre}}</a>
 											@endif										
 											<ul class="sub_menu">
-											@if(session()->get('cliente')=='')
+											@if($usuario=='')
 												<li><a href="{{url('/ingresar')}}">Ingresar</a></li>
 												<li><a href="{{url('/registrarse')}}">Registrarse</a></li>
 											@else
+												<li><a href="{{url('/perfil')}}">Perfil</a></li>
+
 												<li><a href="{{url('/CerrarSesion')}}">Cerrar Sesión</a></li>
 											@endif
 										</ul>
@@ -392,79 +387,55 @@
 
 					<div class="header-wrapicon2">
 						<img src="{{asset('images/icons/icon-header-02.png')}}" class="header-icon1 js-show-header-dropdown" alt="ICON">
-						<span class="header-icons-noti">0</span>
-
+						@if(session('cart'))
+						<span class="header-icons-noti notificacion" >{{$cantidad}}</span>
+						@endif
 						<!-- Header cart noti -->
 						<div class="header-cart header-dropdown">
 							<ul class="header-cart-wrapitem">
+							@if(session('cart'))
+							@foreach(session('cart') as $id=>$producto)
+
 								<li class="header-cart-item">
-									<div class="header-cart-item-img">
-										<img src="{{asset('images/item-cart-01.jpg')}}" alt="IMG">
+								<div class="header-cart-item-img">
+									<img src="{{asset($producto['foto'])}}" alt="IMG">
+								</div>
+
+								<div class="header-cart-item-txt">
+									<a href="#" class="header-cart-item-name">
+										{{$producto['nombre']}}
+									</a>
+
+									<span class="header-cart-item-info">
+										{{$producto['cantidad']}} x {{$producto['precio']}}
+									</span>
+								</div>
+								</li>
+								@endforeach
+								<div class="header-cart-buttons">
+									<div class="header-cart-wrapbtn">
+										<!-- Button -->
+										<a href="{{url('/carrito')}}" class="flex-c-m size1 bg1 bo-rad-20 hov1 s-text1 trans-0-4">
+											Ver Carrito
+										</a>
 									</div>
 
-									<div class="header-cart-item-txt">
-										<a href="#" class="header-cart-item-name">
-											White Shirt With Pleat Detail Back
-										</a>
-
+								
+								</div>
+								@else
+								<li class="header-cart-item">
+									<div class="header-cart-item-txt">						
 										<span class="header-cart-item-info">
-											1 x $19.00
+											No hay productos en el carrito, ingresa a tu cuenta para agregar productos
 										</span>
 									</div>
 								</li>
-
-								<li class="header-cart-item">
-									<div class="header-cart-item-img">
-										<img src="{{asset('images/item-cart-02.jpg')}}" alt="IMG">
-									</div>
-
-									<div class="header-cart-item-txt">
-										<a href="#" class="header-cart-item-name">
-											Converse All Star Hi Black Canvas
-										</a>
-
-										<span class="header-cart-item-info">
-											1 x $39.00
-										</span>
-									</div>
-								</li>
-
-								<li class="header-cart-item">
-									<div class="header-cart-item-img">
-										<img src="{{asset('images/item-cart-03.jpg')}}" alt="IMG">
-									</div>
-
-									<div class="header-cart-item-txt">
-										<a href="#" class="header-cart-item-name">
-											Nixon Porter Leather Watch In Tan
-										</a>
-
-										<span class="header-cart-item-info">
-											1 x $17.00
-										</span>
-									</div>
-								</li>
-							</ul>
-
-							<div class="header-cart-total">
+							@endif
+							<!-- <div class="header-cart-total">
 								Total: $75.00
-							</div>
+							</div> -->
 
-							<div class="header-cart-buttons">
-								<div class="header-cart-wrapbtn">
-									<!-- Button -->
-									<a href="cart.html" class="flex-c-m size1 bg1 bo-rad-20 hov1 s-text1 trans-0-4">
-										View Cart
-									</a>
-								</div>
-
-								<div class="header-cart-wrapbtn">
-									<!-- Button -->
-									<a href="#" class="flex-c-m size1 bg1 bo-rad-20 hov1 s-text1 trans-0-4">
-										Check Out
-									</a>
-								</div>
-							</div>
+							
 						</div>
 					</div>
 				</div>
@@ -485,7 +456,7 @@
 					<li class="item-topbar-mobile p-l-20 p-t-8 p-b-8">
 						<div class="topbar-child2-mobile">
 							<span class="topbar-email">
-								fashe@example.com
+								sombrereriakoras@gmail.com
 							</span>
 
 						</div>
@@ -494,9 +465,26 @@
 					<li class="item-topbar-mobile p-l-10">
 						<div class="topbar-social-mobile">
 							<a href="https://www.facebook.com/sombrererialoskoras/" class="topbar-social-item fa fa-facebook"></a>
-							<a href="#" class="topbar-social-item fa fa-instagram"></a>
+							<!-- <a href="#" class="topbar-social-item fa fa-instagram"></a> -->
 						</div>
 					</li>
+					<!-- <li class="item-menu-mobile">
+						@if($usuario=='')
+							<a>Mi cuenta</a><i class="arrow-main-menu fa fa-angle-right" aria-hidden="true"></i>
+						@else
+							<a>{{$usuario->nombre}}</a><i class="arrow-main-menu fa fa-angle-right" aria-hidden="true"></i>
+						@endif							
+						<ul class="sub-menu">
+							@if($usuario=='')
+								<li><a href="{{url('/ingresar')}}">Ingresar</a></li>
+								<li><a href="{{url('/registrarse')}}">Registrarse</a></li>
+							@else
+								<li><a href="{{url('/perfil')}}">Perfil</a></li>
+
+								<li><a href="{{url('/CerrarSesion')}}">Cerrar Sesión</a></li>
+							@endif							
+						</ul>
+					</li> -->
 
 					<li class="item-menu-mobile">
 						<a href="{{url('/')}}">Inicio</a>
@@ -507,13 +495,16 @@
 					</li>
 
 					<li class="item-menu-mobile">
-						<a>Categorias</a>
+						<a>Categorias</a><i class="arrow-main-menu fa fa-angle-right" aria-hidden="true"></i>
 						<ul class="sub-menu">
+
+						
+
 							@foreach($categorias as $categoria)
 							<li><a href="{{url('/producto-categoria/'.$categoria->id)}}">{{$categoria->categoria}}</a></li>
 							@endforeach
 						</ul>
-						<i class="arrow-main-menu fa fa-angle-right" aria-hidden="true"></i>
+					
 					</li>
 
 					<li class="item-menu-mobile">
@@ -531,6 +522,8 @@
 			</nav>
 		</div>
 	</header>
+
+	
 	@yield('contenido')
 	
 
@@ -544,12 +537,12 @@
 
 				<div>
 					<p class="s-text7 w-size27">
-					¿Alguna pregunta? Háganos saber en la tienda en el octavo piso, 379 Hudson St, Nueva York, NY 10018 o llámenos al (+1) 96 716 6879
+					¿Alguna pregunta? Háganos saber en la tienda en la CALLE 5 AVENIDA 6 ESQUINA, CENTRO, 84200 Agua Prieta, Son. Escribenos al correo sombrereriakoras@gmail.com
 					</p>
 
 					<div class="flex-m p-t-30">
 						<a href="https://www.facebook.com/sombrererialoskoras/" class="fs-18 color1 p-r-20 fa fa-facebook"></a>
-						<a href="#" class="fs-18 color1 p-r-20 fa fa-instagram"></a>
+						<!-- <a href="#" class="fs-18 color1 p-r-20 fa fa-instagram"></a> -->
 						<!-- <a href="#" class="fs-18 color1 p-r-20 fa fa-pinterest-p"></a>
 						<a href="#" class="fs-18 color1 p-r-20 fa fa-snapchat-ghost"></a>
 						<a href="#" class="fs-18 color1 p-r-20 fa fa-youtube-play"></a> -->
@@ -586,48 +579,28 @@
 						</a>
 					</li>
 
-					<li class="p-b-9">
-						<a href="{{url('/contactanos')}}" class="s-text7">
-							Contactanos
-						</a>
-					</li>
+					
 				</ul>
 			</div>
 
 			<div class="w-size7 p-t-30 p-l-15 p-r-15 respon4">
 				<h4 class="s-text12 p-b-30">
-					Help
+					Ayuda
 				</h4>
 
 				<ul>
 					<li class="p-b-9">
-						<a href="#" class="s-text7">
-							Track Order
+						<a href="{{url('/contactanos')}}" class="s-text7">
+							Contactanos
 						</a>
 					</li>
 
-					<li class="p-b-9">
-						<a href="#" class="s-text7">
-							Returns
-						</a>
-					</li>
-
-					<li class="p-b-9">
-						<a href="#" class="s-text7">
-							Shipping
-						</a>
-					</li>
-
-					<li class="p-b-9">
-						<a href="#" class="s-text7">
-							FAQs
-						</a>
-					</li>
+					
 				</ul>
 			</div>
 		</div>
 
-		<div class="t-center p-l-15 p-r-15">
+		<!-- <div class="t-center p-l-15 p-r-15">
 			<a >
 				<img class="h-size2" src="{{asset('images/icons/paypal.png')}}" alt="IMG-PAYPAL">
 			</a>
@@ -640,13 +613,39 @@
 				<img class="h-size2" src="{{asset('images/icons/mastercard.png')}}" alt="IMG-MASTERCARD">
 			</a>
 
-		</div>
+		</div> -->
 	</footer>
 
 	<!--===============================================================================================-->
-	<script type="text/javascript" src="{{asset('vendor/jquery/jquery-3.2.1.min.js')}}"></script>
+	
 <!--===============================================================================================-->
-	<script type="text/javascript" src="{{asset('vendor/animsition/js/animsition.min.js')}}"></script>
+
+	<script>
+        $(document).ready(function () 
+        {
+            @if(session()->get('messages'))
+
+                <?php
+                    $fm = explode('|', session()->get('messages'));
+                    if (count($fm) > 1) 
+                    {
+                        $ftype = $fm[0];
+                        
+                        $fmessage = $fm[1];
+                    }
+                ?>
+                var timeout = setTimeout(() => 
+                {
+                    swal.close()
+                }, 5000);
+				swal("","{{ $fmessage }}", "{{$ftype}}").then((value) => {
+                    clearTimeout(timeout);
+                });
+              
+                        
+            @endif
+        });
+    </script>
 <!--===============================================================================================-->
 	<script type="text/javascript" src="{{asset('vendor/bootstrap/js/popper.js')}}"></script>
 	<script type="text/javascript" src="{{asset('vendor/bootstrap/js/bootstrap.min.js')}}"></script>
@@ -673,13 +672,41 @@
 <!--===============================================================================================-->
 	<script type="text/javascript" src="{{asset('vendor/sweetalert/sweetalert.min.js')}}"></script>
 
+	<!-- carrito pantalla completa -->
 	<script type="text/javascript">
-		$('.block2-btn-addcart').each(function(){
-			var nameProduct = $(this).parent().parent().parent().find('.block2-name').html();
-			$(this).on('click', function(){
-				swal(nameProduct, "¡Se ha agregado al carrito!", "success");
-			});
-		});
+		// $('.añadircarrito').each(function(){
+		// 	var id=$(this).find('.addtoCart').val();
+		// 	var nameProduct = $(this).parent().parent().parent().find('.block2-name').html();
+		// 	var datos  = new FormData();
+		// 	datos.append("id",id);
+		// 	$(this).on('click', function(){
+		// 		$.ajax({
+		// 			headers: {
+		// 				'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+		// 			},
+		// 			url:"/producto/agregar-producto-carrito",
+		// 			method:"POST",
+		// 			data: datos,
+		// 			cache:false,
+		// 			contentType:false,
+		// 			processData:false,
+		// 			dataType:"json",
+		// 			success:function(respuesta)
+		// 			{
+						
+		// 				if(respuesta!=0){
+		// 					$('.notificacion').html(respuesta);
+		// 				  swal(nameProduct, "¡Se ha agregado al carrito!", "success");
+		// 				}else{
+		// 					swal('Lo sentimos', "¡inicie sesion para agregar productos al carrito!", "error");
+		// 				}
+		// 			}
+		// 		})
+		// 		// swal(nameProduct, "¡Se ha agregado al carrito!", "success");
+				
+
+		// 	});
+		// });
 
 		$('.block2-btn-addwishlist').each(function(){
 			var nameProduct = $(this).parent().parent().parent().find('.block2-name').html();
@@ -689,7 +716,7 @@
 		});
 	</script>
 
-	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAKFWBqlKAGCeS1rMVoaNlwyayu0e0YRes"></script>
+
 
 	<script src="{{asset('js/map-custom.js')}}"></script>
 <!--===============================================================================================-->
@@ -701,21 +728,41 @@
 <!--===============================================================================================-->
 	<script src="{{asset('js/main.js')}}"></script>
 
-	<script src="{{asset('js/filtro.js')}}"></script>
+	
 
-
+<!-- carrito en movil -->
 	<script type="text/javascript">
-		$('.block2-btn-addcart').each(function(){
-			var nameProduct = $(this).parent().parent().parent().find('.block2-name').html();
-			$(this).on('click', function(){
-				swal(nameProduct, "is added to cart !", "success");
-			});
-		});
+		// $('.block2-btn-addcart').each(function(){
+		// 	var nameProduct = $(this).parent().parent().parent().find('.block2-name').html();
+		// 	$(this).on('click', function(){
+		// 		$.ajax({
+		// 			headers: {
+		// 				'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+		// 			},
+		// 			url:"/producto/agregar-producto-carrito",
+		// 			method:"POST",
+		// 			data: datos,
+		// 			cache:false,
+		// 			contentType:false,
+		// 			processData:false,
+		// 			dataType:"json",
+		// 			success:function(respuesta)
+		// 			{
+		// 				if(respuesta==1){
+							
+		// 				  swal(nameProduct, "¡Se ha agregado al carrito!", "success");
+		// 				}else{
+		// 					swal('Lo sentimos', "¡inicie sesion para agregar productos al carrito!", "error");
+		// 				}
+		// 			}
+		// 		})
+		// 	});
+		// });
 
 		$('.block2-btn-addwishlist').each(function(){
 			var nameProduct = $(this).parent().parent().parent().find('.block2-name').html();
 			$(this).on('click', function(){
-				swal(nameProduct, "is added to wishlist !", "success");
+				swal(nameProduct, "¡Se ha agregado a Favoritos!", "success");
 			});
 		});
 	</script>

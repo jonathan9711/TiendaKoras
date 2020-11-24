@@ -436,9 +436,11 @@ function nuevaCantidadProducto()
 
 window.onload = function()
 {
+	
    var almacenVenta = $('#almacenVenta').val();
    listarProductos();
    listarMetodos();
+   
    mostrarTablaVenta(almacenVenta);
 };
 

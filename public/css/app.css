@@ -8618,9 +8618,9 @@ button.bg-dark:focus {
 }
 
 .pt-4,
-.py-4 {
+/* .py-4 {
   padding-top: 1.5rem !important;
-}
+} */
 
 .pr-4,
 .px-4 {
@@ -8629,8 +8629,9 @@ button.bg-dark:focus {
 
 .pb-4,
 .py-4 {
-  padding-bottom: 17.9rem !important;
-  background-image: url("http://127.0.0.1:8000/img/6422.jpg");
+  /* padding-bottom: 17.9rem !important; */
+  
+  /* background-image: url("http://127.0.0.1:8000/img/6422.jpg"); */
   background-size:cover
 }
 

@@ -51,20 +51,106 @@ $('#daterange-btn3').daterangepicker(
      var datos = new FormData();
      datos.append("fechaInicial", fechaInicial);
      datos.append("fechaFinal", fechaFinal);
-    
-    if (perfil == "Gerente General")
-    {
-      window.location = "/ajax/fechas/"+datos;
-    }
-    else
-    {
+     if (perfil == "Gerente General")
+     {
+       almacen='';
       datos.append("almacen", almacen);
-      window.location = "/ajax/fechas/"+datos;
-    }
+      //  window.location = "/ajax/fechas/"+datos;
+     }
+     else
+     {
+       datos.append("almacen", almacen);
+      //  window.location = "/ajax/fechas/"+datos;
+     }
+     $.ajax({
+			headers: {
+				'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+			},
+			url:"/ajax/Rango_fechas",
+			method:"POST",
+			data: datos,
+			cache:false,
+			contentType:false,
+			processData:false,
+			dataType:"json",
+			success:function(respuesta)
+			{		
+        // console.log("tamaño "+respuesta.length);
+        var contenido='';
+        var i=0;
+        contenido+='<thead>';
+                     contenido+='<tr>';
+                         contenido+='<th style="width: 10px">#</th>';
+                         contenido+='<th>Producto</th>';
+                         contenido+='<th>Almacen</th>';
+                        contenido+=' <th>Tipo de movimiento</th>';
+                         contenido+='<th>Catidad</th>';
+                         contenido+='<th>Usuario</th>';
+                         contenido+='<th>Descripción</th>';
+                         contenido+='<th>Hora</th>';
+                         contenido+='<th>Fecha</th>';
+                     contenido+='</tr>';
+                    contenido+= '</thead>';
+        for(var key=0; key<respuesta.length; key++) 
+        {
+          contenido+= '<tr>';
+          contenido+= '<td>'+(key+1)+'</td>';
+          contenido+='<td>'+respuesta[key]['producto']+'</td>';
+          contenido+='<td>'+respuesta[key]["almacen"]+'</td>';
+          contenido+='<td>'+respuesta[key]["tipo_movimiento"]+'</td>';
+          contenido+='<td>'+respuesta[key]["cantidad"]+'</td>';
+          contenido+='<td>'+respuesta[key]["usuario"]+'</td>';
+          contenido+='<td>'+respuesta[key]["descripción"]+'</td>';
+          contenido+='<td>'+respuesta[key]["hora"]+'</td>';
+          contenido+='<td>'+respuesta[key]["fecha"]+'</td>';
+          contenido+='</tr>'; 
+        
+        }
+        $(".tablas").DataTable().clear().destroy(); 
+        $(".tablas").html(contenido); 
+        tabla();
+	     	// window.location.reload();
+			}
+		})
+    
+    
    	
 
   })
-
+function tabla(){
+  $(".tablas").DataTable({
+    "lengthMenu": [[20, 30, 50, -1], [20, 30, 50, "All"]],
+       language: {
+       sProcessing: "Procesando...",
+       sLengthMenu: "Mostrar _MENU_ registros",
+       sZeroRecords: "No se encontraron resultados",
+       sEmptyTable: "Ningún dato disponible en esta tabla",
+       sInfo:
+           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_",
+       sInfoEmpty: "Mostrando registros del 0 al 0 de un total de 0",
+       sInfoFiltered: "(filtrado de un total de _MAX_ registros)",
+       sInfoPostFix: "",
+       sSearch: "Buscar:",
+       sUrl: "",
+       sInfoThousands: ",",
+       sLoadingRecords: "Cargando...",
+       oPaginate: {
+           sFirst: "Primero",
+           sLast: "Último",
+           sNext: "Siguiente",
+           sPrevious: "Anterior",
+       },
+       oAria: {
+           sSortAscending:
+               ": Activar para ordenar la columna de manera ascendente",
+           sSortDescending:
+               ": Activar para ordenar la columna de manera descendente",
+       },
+       
+       
+       }
+  });
+}
 
 /*=============================================
 CANCELAR RANGO DE FECHAS
@@ -107,17 +193,68 @@ $(".daterangepicker.opensright .ranges li").on("click", function(){
     var datos = new FormData();
     datos.append("fechaInicial", fechaInicial);
     datos.append("fechaFinal", fechaFinal);
-   
-   
     if (perfil == "Gerente General")
-    {
-      window.location = "/ajax/fechas/"+datos;
-    }
-    else
-    {
+     {
+       almacen='';
       datos.append("almacen", almacen);
-      window.location = "/ajax/fechas/"+datos;
-    }
+      //  window.location = "/ajax/fechas/"+datos;
+     }
+     else
+     {
+       datos.append("almacen", almacen);
+      //  window.location = "/ajax/fechas/"+datos;
+     }
+     $.ajax({
+			headers: {
+				'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+			},
+			url:"/ajax/Rango_fechas",
+			method:"POST",
+			data: datos,
+			cache:false,
+			contentType:false,
+			processData:false,
+			dataType:"json",
+			success:function(respuesta)
+			{		
+        // console.log("tamaño "+respuesta.length);
+        var contenido='';
+        var i=0;
+        contenido+='<thead>';
+                     contenido+='<tr>';
+                         contenido+='<th style="width: 10px">#</th>';
+                         contenido+='<th>Producto</th>';
+                         contenido+='<th>Almacen</th>';
+                        contenido+=' <th>Tipo de movimiento</th>';
+                         contenido+='<th>Catidad</th>';
+                         contenido+='<th>Usuario</th>';
+                         contenido+='<th>Descripción</th>';
+                         contenido+='<th>Hora</th>';
+                         contenido+='<th>Fecha</th>';
+                     contenido+='</tr>';
+                    contenido+= '</thead>';
+        for(var key=0; key<respuesta.length; key++) 
+        {
+          contenido+= '<tr>';
+          contenido+= '<td>'+(key+1)+'</td>';
+          contenido+='<td>'+respuesta[key]['producto']+'</td>';
+          contenido+='<td>'+respuesta[key]["almacen"]+'</td>';
+          contenido+='<td>'+respuesta[key]["tipo_movimiento"]+'</td>';
+          contenido+='<td>'+respuesta[key]["cantidad"]+'</td>';
+          contenido+='<td>'+respuesta[key]["usuario"]+'</td>';
+          contenido+='<td>'+respuesta[key]["descripción"]+'</td>';
+          contenido+='<td>'+respuesta[key]["hora"]+'</td>';
+          contenido+='<td>'+respuesta[key]["fecha"]+'</td>';
+          contenido+='</tr>'; 
+        
+        }
+        $(".tablas").DataTable().clear().destroy(); 
+        $(".tablas").html(contenido); 
+        tabla();
+	     	// window.location.reload();
+			}
+		})
+    
 	}
 
 })

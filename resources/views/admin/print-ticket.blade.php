@@ -81,7 +81,7 @@
 </head>
 
 <body>
-
+<?php  ?>
   <div class="ticket">
 
   <p class="centrado bold"><img src="{{asset('vistas/img/plantilla/logo.png')}}" style="width: 45%"></p>
@@ -98,16 +98,31 @@
         </tr>
       </thead>
       <tbody>
-      @foreach($product as $prod)
-        <tr>
-         
-          <td class="cantidad">{{ $prod->cantidad }}</td>
-          <td class="producto">{{ $prod->descripcion }}</td>
-          <td class="precio">${{ $prod->precio }}</td>
-          <td class="total">${{ $prod->total }}</td>
-          
-        </tr>
-      @endforeach
+        @if($value->metodo_pago=="card")
+          @foreach($product as $prod)
+            @foreach($prod->descripcion as $p)
+              <tr>
+              
+                <td class="cantidad">{{ $p->cantidad }}</td>
+                <td class="producto">{{ $prod->nombre}} de talla {{$p->talla  }},</td>
+                <td class="precio">${{ $prod->precio }}</td>
+                <td class="total">${{  $p->cantidad*$prod->precio }}</td>
+                
+              </tr>
+            @endforeach
+          @endforeach
+        @else
+          @foreach($product as $prod)
+            <tr>
+            
+              <td class="cantidad">{{ $prod->cantidad }}</td>
+              <td class="producto">{{ $prod->descripcion }}</td>
+              <td class="precio">${{ $prod->precio }}</td>
+              <td class="total">${{ $prod->total }}</td>
+              
+            </tr>
+          @endforeach
+        @endif
         <tr>
           <td class="cantidad"></td>
           <td class="producto" colspan="2">TOTAL</td>

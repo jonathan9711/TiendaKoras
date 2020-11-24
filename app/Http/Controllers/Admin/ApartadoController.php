@@ -322,4 +322,8 @@ class ApartadoController extends Controller
 			return 0; 
 		}
 	}
+
+	public function VerOrdenes(){
+		return view('admin.ordenes');
+	}
 }

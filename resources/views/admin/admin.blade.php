@@ -103,7 +103,7 @@
   <!-- daterangepicker http://www.daterangepicker.com/-->
   <script src="{{asset('vistas/bower_components/moment/min/moment.min.js')}}"></script>
   <script src="{{asset('vistas/bower_components/bootstrap-daterangepicker/daterangepicker.js')}}"></script>
-  <!-- Morris.js charts http://morrisjs.github.io/morris.js/-->
+  <!-- Morris.js charts http://morrisjs.github.io/morris.js/ -->
   <script src="{{asset('vistas/bower_components/raphael/raphael.min.js')}}"></script>
   <script src="{{asset('vistas/bower_components/morris.js/morris.min.js')}}"></script>
   <!-- ChartJS http://www.chartjs.org/-->

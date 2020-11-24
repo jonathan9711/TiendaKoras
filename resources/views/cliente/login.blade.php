@@ -9,7 +9,7 @@
 @endif
 
 <div class="limiter">
-		<div class="container-login100" style="background-image: url({{asset('vistas/img/plantilla/paisaje.jpg')}});">
+		<div class="container-login100" style="background-image: url({{asset('vistas/img/plantilla/paisaje2.jpg')}});">
 			<div class="wrap-login100">
 				<form class="login100-form validate-form" action="{{url('/ingresar')}}" method="POST"> 
                     {{csrf_field()}}
@@ -40,7 +40,7 @@
 						</button>
 					</div>
                         <br>
-
+				</form>
                     <div class="text-center p-t-90">
 						<a class="txt1" href="{{url('/registrarse')}}">
 							Crear cuenta
@@ -50,8 +50,8 @@
                          <br>
 
 					<div class="text-center p-t-90">
-						<a class="txt1" href="#">
-							olvide mi contraseña
+						<a type="button" class="txt1" href="{{route('ContraseñaCliente')}}">
+							Mis datos ya estan registrados por la tienda
 						</a>
 					</div>
 
@@ -62,7 +62,7 @@
 							Volver
 						</a>
 					</div>
-				</form>
+				
 			</div>
 		</div>
 	</div>
@@ -70,33 +70,6 @@
 
 	<div id="dropDownSelect1"></div>
 
-<!-- <div id="formWrapper">
-
-<div id="form">
-<div class="logo">
-    <img src="{{asset('vistas/img/plantilla/logo.png')}}" alt="">
-   <h1 class="text-center head">Sombrereria Koras</h1> 
-</div>
-  
-    <form  action="{{url('/ingresar')}}" method="POST"> 
-        {{csrf_field()}}
-            
-        <div class="form-item">
-            <label class="logtext">E-mail</label>
-            <input type="email" name="email" id="email" class="form-style" autocomplete="off"/>
-        </div>
-        <div class="form-item">
-            <label class="logtext">Password</label>
-            <input type="password" name="password" id="password" class="form-style" />
-        </div>
-        <div class="form-item">
-            <p class="pull-left"><a href="{{url('/registrarse')}}">Registrarse</a></p>
-            <input type="submit" class="login pull-right" value="Log In">
-        <div class="clear-fix"></div>
-        </div>
-    </form>
-</div>
-</div> -->
 
 
     

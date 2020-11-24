@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\cliente;
 use App\inventario;
 use App\Movimientos;
+use App\ordenes;
 use App\producto;
 use App\usuarios;
 use App\venta;
@@ -13,6 +14,7 @@ use DateInterval;
 use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rules\Unique;
 
 class VentaController extends Controller
 {
@@ -42,7 +44,9 @@ class VentaController extends Controller
 
     public function reportes()
     {
-      return view('admin.reportes');
+      $fechaInicial=null;
+      $fechaFinal=null;
+      return view('admin.reportes',compact('fechaInicial','fechaFinal'));
     }
     
       //editar la venta en uso
@@ -200,15 +204,17 @@ class VentaController extends Controller
                 $item = "id_producto";
                 $valor = $value["id"];
                   
-                $respuesta = inventario::where($item,$valor)->get();
+                $respuesta = inventario::where($item,$valor)->where('id_almacen',$almacen)->get();
                 $item1a = "venta";
                   $valor1a = $cantidad + $respuesta[0]->venta;              
-                  $nuevaVenta = Inventario::where("id_producto", "=" ,$valor)->update(['venta' => $valor1a]);
+                  $nuevaVenta = Inventario::where("id_producto", "=" ,$valor)
+                  ->where('id_almacen',$almacen)->update(['venta' => $valor1a]);
 
 
                   $item1b = "existencia";
                   $valor1b = $value["existencia"];
-                  $nuevaExistencia = Inventario::where("id_producto", "=" ,$valor)->update(['existencia' => $valor1b]);
+                  $nuevaExistencia = Inventario::where("id_producto", "=" ,$valor)
+                  ->where('id_almacen',$almacen)->update(['existencia' => $valor1b]);
                   // dd($nuevaExistencia);
 
                   date_default_timezone_set('America/Hermosillo');
@@ -353,7 +359,11 @@ class VentaController extends Controller
     {
       $codigo=$request->codigo; 
       $data=venta::where('codigo',$codigo)->get(); 
-      $resultado=json_decode($data[0]['productos']);
+      
+        $resultado=json_decode($data[0]['productos']);
+      
+      
+      // dd($resultado);
       return view('admin.detalle-venta',compact('data','codigo','resultado'));
     }
     //impresion del ticket
@@ -693,7 +703,7 @@ class VentaController extends Controller
           
           if($respuesta3)
           {
-            session()->flash('messages', 'success|La venta ha sido guardada correctamente');
+            session()->flash('messages', 'success|La venta ha sido Cancelada correctamente');
             return 1;
           }else{
             session()->flash('messages', 'error|La Venta no pudo Borrarse');
@@ -709,5 +719,249 @@ class VentaController extends Controller
         
       }
     }
+
+    public function ventas_rangofecha_grafico(Request $request)
+    {    
+      $fechaInicial=$request->fechaInicial;
+      $fechaFinal=$request->fechaFinal;
+      $almacen=$request->almacen;
+      $respuesta = ctrRangoFechasVentas($fechaInicial, $fechaFinal, $almacen);
+      $arrayFechas = array();
+      $arrayVentas = array();
+      $sumaPagosMes= array();
+       $res = array();
+     $suma=0;
+        foreach ($respuesta as $key => $value)
+        {
+            $fecha = substr($value->fecha,0,7);
+            array_push($arrayFechas, $fecha);
+            $arrayVentas = array($fecha => $value->total);
+            foreach ($arrayVentas as $key => $value) 
+            {
+              $suma+=$value;
+                $sumaPagosMes[$key] = $suma; 
+            }
+        }
+       
+       $noRepetirFechas = array_unique($arrayFechas);
+      // dd($noRepetirFechas);
+          if($noRepetirFechas != null)
+          {
+            $i;
+            foreach($arrayFechas as $key)
+            {    
+              $data=  "{ y: ".$key.", ventas: ".$sumaPagosMes[$key]." }";    
+               $i=$key; 
+            }
+    
+            //  $data=  "{y: '".$key."', ventas: ".$sumaPagosMes[$key]." }";
+        
+            }else{
+        
+             $data=  "{ y: '0', ventas: '0' }";
+        
+            }
+            // 
+           array_push($res,[$i,$sumaPagosMes]);
+           dd(response()->json($res));
+          return response()->json($res);
+    }
    
+    public function mostrarTablaOrdenes(Request $request)
+    {
+          // dd($request);
+           $estado=$request->estado;
+            if($estado=="todos"){
+              $ordenes=ordenes::all();
+            }else{
+              $ordenes=ordenes::where('status',$estado)->get();
+            }
+            $codigoFactura="";
+            $nombrePedido="";  
+            $datos="";  
+              //  dd($usuario);
+              //  ctrMostrarUsuariosMenosUno($dato,$almacen);
+           $res = [ "data" => []];
+              $i=1;
+        foreach($ordenes as $key =>$value)
+        {
+          $cliente=cliente::where('id_cliente',$value->id_cliente)->first();
+          $venta=venta::where('id_venta',$value->id_venta)->first();
+           $orden=unserialize($value->carrito);
+          // dd($cliente);
+         
+         
+             /*=============================================
+            TRAEMOS LAS ACCIONES
+            =============================================*/ 
+           foreach($orden as $or){ 
+             $nombrePedido.=$or['nombre'].", ";
+          
+         
+
+            
+            foreach($or['descripcion'] as $val){
+              $datos.=" tipo de talla: ".$val['tipo_talla'].", ".$val['cantidad']." de talla: ".$val['talla'].", ";
+            }
+          
+              }
+              
+            if ($value->status==1)
+            {
+                 $botonEstado = "<button class='btn btn-success btn-xs btnActivar activado' idOrden='".$value->id."'  estadoOrden=1>Entregado</button>";
+            }
+            else
+            {
+              $botonEstado = "<button class='btn btn-danger btn-xs btnActivar activado'  idOrden='".$value->id."' estadoOrden=0>Pendiente</button>";
+            }
+            
+            if ($value->nombre != "Matriz")
+            {
+                        //   "<div class='btn-group'><button class='btn btn-warning btnEditarUsuario' idUsuario='".$value->id."'  data-toggle='modal' data-target='#modalEditarUsuario'><i class='fa fa-pencil'></i></button>
+                        $botones = "<button class='btn btn-danger  btnEliminarOrden' title='Eliminar Orden'  idOrden='".$value->id."' usuario='".$value->usuario."'  fotoUsuario'".$value->foto."'><i class='fa fa-times'></i></button></div>"; 
+            }
+            
+            // $almacenNombre = almacen::where('id_almacen',$value->almacen)->get();
+          array_push($res['data'], [
+            ($i),
+            $venta->codigo,
+            $cliente->nombre,
+            $cliente->email,
+            $cliente->telefono,
+            $cliente->ciudad,
+            $cliente->direccion,
+            $nombrePedido,
+            $datos,
+            $botonEstado,
+            $botones
+          ]);
+            $datos="";
+            $nombrePedido="";
+            $i++;
+        }
+       
+        
+            return response()->json($res);
+      
+      
+    }
+
+    public function activar_orden(Request $request)
+    {
+      // dd($request);
+      $estado=$request->activarEstado;
+      if($estado==0){
+        $estado=1;
+      }else{
+        $estado=0;
+      }
+      $id=$request->IdOrden;		
+      $item1 = "status";	
+      $item2 = "id";	
+      $respuesta = ordenes::where($item2,$id)->update([$item1=>$estado]);
+        
+    }
+
+    public function eliminar_orden(Request $request)
+    {
+      
+      $idOrden=$request->IdOrden;
+      $orden=ordenes::where('id',$idOrden)->first();
+      
+      $idVenta=$orden->id_venta;
+      // dd($request);
+      if ($idVenta!=null) 
+      {
+        
+        $tablaClientes = "cliente";
+        $item = "id_venta";
+        $valor = $idVenta;
+        $usuarioRoot = Auth::guard("admin")->user();
+        
+        $traerVenta = Venta::where($item,$valor)->get();
+        if($traerVenta[0]['status']!='Cancelada')
+        {
+            $productos = json_decode($traerVenta[0]["productos"],true);
+           
+            $totalProductosComprados = array();
+    
+            foreach ($productos as $key => $value)
+            {
+              array_push($totalProductosComprados, $value['cantidad']);
+
+              $item = "id_producto";
+              $valor = $value['id'];
+              $almacen = $traerVenta[0]["id_almacen"];
+      
+              $traerInventario = Inventario::where($item,$valor)->where('id_almacen',$almacen)->get();
+      
+              $item1a = "venta";
+              $valor1a = $traerInventario[0]["venta"] - $value['cantidad'];
+              // dd($traerInventario[0]["venta"],"- ", $value['cantidad'],"=",$valor1a);
+              $nuevasVentas = Inventario:: where("id_producto", "=" ,$valor)->update(['venta' => $valor1a]);
+            
+      
+              $item1b = "existencia";
+              $valor1b = $value["cantidad"] + $traerInventario[0]["existencia"];
+      
+              $nuevaExistencia = Inventario::where("id_producto", "=" ,$valor)->update(['existencia' => $valor1b]);
+              //agregar un movimiento
+              //sacamos la fecha actual para guardar en movimientos
+              date_default_timezone_set('America/Hermosillo');
+              $fecha = date('Y-m-d');
+              $hora = date('H:i:s');
+              $datos = array("id_producto" => $value["id"], 
+                                    "id_almacen" => $almacen,
+                                  "cantidad" => $value["cantidad"],
+                                  "tipo_movimiento" => "Entrada",
+                                  "id_usuario" => $usuarioRoot->id,
+                                  "descripción" => "Devolución",
+                                  "hora"=>$hora,
+                                  "fecha" => $fecha);
+              // $tablaMovimientos = "movimientos_inventario";
+              $respuesta2 = Movimientos::insert($datos);
+            }
+    
+            $itemCliente = "id_cliente";
+            $valorCliente = $traerVenta[0]["id_cliente"];
+      
+            $traerCliente = Cliente::where($itemCliente, $valorCliente)->get();
+      
+            $item1a = "compras";
+            $valor1a = $traerCliente[0]["compras"] - array_sum($totalProductosComprados);
+      
+            $comprasCliente = Cliente::where($itemCliente, "=" ,$valorCliente)->update([$item1a => $valor1a]);
+          
+      
+              /*=============================================
+            ELIMINAR VENTA
+            =============================================*/
+            $item1="status";
+            $valor1="Cancelada";
+            
+            $valor = $idVenta;
+      
+            $respuesta3 = Venta::where('id_venta', "=" ,$valor)->update([$item1 => $valor1]);
+          // mdlActualizarVenta($tablaVenta,$item1,$valor1,$valor);
+          
+          if($respuesta3)
+          {
+            ordenes::destroy($idOrden);
+            session()->flash('messages', 'success|La venta ha sido Cancelada correctamente');
+            return 1;
+          }else{
+           
+            session()->flash('messages', 'error|La Venta no pudo Borrarse');
+            return redirect()->back();
+          }
+        }else{
+          ordenes::destroy($idOrden);
+          session()->flash('messages', 'error|Se ha Borrado la Orden, y La Venta ya habia sido cancelada');
+          return 0;
+        }
+       
+         
+        
+      }
+    }
 }

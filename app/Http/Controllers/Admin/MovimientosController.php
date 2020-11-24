@@ -7,7 +7,7 @@ use App\Movimientos;
 use Illuminate\Http\Request;
 use Mockery\Undefined;
 use PhpParser\JsonDecoder;
-
+use Illuminate\Support\Facades\DB;
 use function GuzzleHttp\json_decode;
 
 class MovimientosController extends Controller
@@ -15,7 +15,8 @@ class MovimientosController extends Controller
     public function movimientos()
     {
         $movimiento=movimientos::all();
-        return view('admin.movimientos',compact('movimiento'));
+        $id_producto=null;
+        return view('admin.movimientos',compact('movimiento','id_producto'));
     }
 
     public function ajaxVerificarRegistrosProducto(Request $request)
@@ -49,8 +50,6 @@ class MovimientosController extends Controller
 
     public function movimientos_rango(Request $request)
     {
-       
-
         if ($request->id_producto)
         {
             
@@ -63,7 +62,7 @@ class MovimientosController extends Controller
             //turn dd();
             //return $movimientos;
             
-            return view('admin.movimientos', compact('movimiento'));
+            return view('admin.movimientos', compact('movimiento','id_producto'));
         }
         else
         {
@@ -78,7 +77,7 @@ class MovimientosController extends Controller
                     //return $movimientos->toArray();
                     //return response()->json($movimientos);
                    // return $movimientos;
-                    return view('admin.movimientos',compact('movimiento'));
+                    return view('admin.movimientos',compact('movimiento','id_producto'));
                 }
                 else
                 {
@@ -89,7 +88,7 @@ class MovimientosController extends Controller
                     ////return $movimientos->toArray();
                     ////return response()->json($movimientos);
                     //return $movimientos;
-                   return view('admin.movimientos',compact('movimiento'));
+                   return view('admin.movimientos',compact('movimiento','id_producto'));
                    
                 }
             
@@ -111,11 +110,9 @@ class MovimientosController extends Controller
                 //return $movimientos;
                 ////return $movimientos;
                 ////return response()->json($movimientos);
-                return view('admin.movimientos',compact('movimiento'));
+                return view('admin.movimientos',compact('movimiento','id_producto'));
             }
         }
-
-
     }
 
     public static function ctrVerMovimientos($fechaInicio,$fechaFin)
@@ -127,8 +124,44 @@ class MovimientosController extends Controller
 
     public static function productos_rangofecha(Request $request)
     {
-        dd($request);
-    	return route('admin.movimientos');
+    
+        $almacen=$request->almacen;
+
+        $fechaInicial=$request->fechaInicial;
+        $fechaFinal = $request->fechaFinal;
+        if($almacen=='')
+        {
+            // $movimiento=Movimientos::whereBetween('fecha',[$fechaInicial,$fechaFinal])->get();        
+            $respuesta = DB::table('movimientos_inventario')
+            ->whereBetween('movimientos_inventario.fecha',[$fechaInicial,$fechaFinal])
+            ->join('usuarios','usuarios.id','movimientos_inventario.id_usuario')            
+            ->join('producto','producto.id_producto','movimientos_inventario.id_producto')             
+            ->join('almacen','almacen.id_almacen','movimientos_inventario.id_almacen')
+            ->select('movimientos_inventario.*','usuarios.nombre as usuario','producto.nombre as producto','almacen.nombre as almacen')          
+            ->get();
+
+        
+           
+             return $respuesta;
+            // return redirect()->route('admin.movimientos',compact('movimiento'));
+            
+        }else
+        {
+            $respuesta = DB::table('movimientos_inventario')
+            ->where('id_almacen',$almacen)->whereBetween('fecha',[$fechaInicial,$fechaFinal])
+            ->join('usuarios','usuarios.id','movimientos_inventario.id_usuario')            
+            ->join('producto','producto.id_producto','movimientos_inventario.id_producto')              
+            ->join('almacen','almacen.id_almacen','movimientos_inventario.id_almacen')
+            ->select('movimientos_inventario.*','usuarios.nombre as usuario','producto.nombre as producto','almacen.nombre as almacen')
+            ->get();
+
+            // $movimiento=Movimientos::where('id_almacen',$almacen)->whereBetween('fecha',[$fechaInicial,$fechaFinal])
+            
+            // ->get();        
+            
+            return $respuesta;
+            // return redirect()->route('admin.movimientos',compact('movimiento'));
+        }
     }
 
     public static function ctrVerTodoMovimiento($almacen)

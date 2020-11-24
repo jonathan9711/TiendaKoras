@@ -117,8 +117,8 @@
 
     <div class="modal-content">
 
-        <form role="form" method="post" enctype="multipart/form-data">
-
+        <form role="form" method="post" action="{{route('admin.entradaproducto')}}" enctype="multipart/form-data">
+        {{csrf_field()}}
           <div class="modal-header" style="background: #3c8dbc; color:white">
 
             <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -141,7 +141,7 @@
 
                 <input type="text" class="form-control input-lg" name="codigoEntrada" id="codigoEntrada" readonly="">
                 <input type="hidden" name="id_productoS" id="id_productoS">
-
+                <input type="hidden" id="usuario" name="usuario" value="{{$usuario->id}}">
               </div>
 
             </div>
@@ -226,8 +226,8 @@
 
     <div class="modal-content">
 
-        <form role="form" method="post" enctype="multipart/form-data">
-
+        <form role="form" method="post" action="{{route('admin.salidaproducto')}}" enctype="multipart/form-data">
+        {{csrf_field()}}
           <div class="modal-header" style="background: #3c8dbc; color:white">
 
             <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -250,7 +250,7 @@
 
                 <input type="text" class="form-control input-lg" name="codigoSalida" id="codigoSalida" readonly>
                 <input type="hidden" name="id_producto" id="id_producto">
-
+                <input type="hidden" id="usuario" name="usuario" value="{{$usuario->id}}">
               </div>
 
             </div>

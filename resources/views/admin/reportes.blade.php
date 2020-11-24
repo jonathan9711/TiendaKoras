@@ -12,7 +12,11 @@
         <li><a href="inicio"><i class="fa fa-dashboard"></i>Inicio</a></li>
 
         <li class="active">Reportes de ventas</li>
-
+        <meta name="csrf-token" content="{{ csrf_token() }}" />
+        <?php
+          $usuario=Auth::guard("admin")->user();        
+        ?>
+        <input type="hidden" id="almacenes" name="alamacen" value="{{$usuario->almacen}}">
     </ol>
 
   </section>

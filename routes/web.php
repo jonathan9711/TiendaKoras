@@ -31,6 +31,7 @@ Route::group(['prefix'=>'panel','namespace'=>'Admin'],function(){
 		], function()
 		{
             Route::get('/',['uses'=>'InicioController@index','as'=>'inicio']);
+            Route::get('/cerrar-sesion',['uses'=>'AuthController@logout','as'=>'cerrar-sesion']);
 
             Route::get('/crear-venta',['uses'=>'VentaController@crearventa','as'=>'crear-venta']);
             Route::post('/crear-venta',['uses'=>'VentaController@ctrCrearVenta','as'=>'crearventas']);
@@ -49,8 +50,10 @@ Route::group(['prefix'=>'panel','namespace'=>'Admin'],function(){
 
             Route::get('/inventario',['uses'=>'InventarioController@vistainventario','as'=>'inventario']);
             Route::post('/inventario',['uses'=>'InventarioController@ctrAgregarExistenciaAlmacen','as'=>'agregarExistencia']);
+            Route::post('/entrada-inventario',['uses'=>'InventarioController@ctrAgregarInventario','as'=>'entradaproducto']);
+            Route::post('/salida-inventario',['uses'=>'InventarioController@ctrSalidaProducto','as'=>'salidaproducto']);            
             Route::get('/movimientos',['uses'=>'MovimientosController@movimientos','as'=>'movimientos']);
-            // Route::post('/movimientos-rango',['uses'=>'MovimientosController@movimientos_rango','as'=>'movimientosfecha']);
+            Route::post('/movimientos-rango',['uses'=>'MovimientosController@movimientos_rango','as'=>'movimientosfecha']);
             
             
 
@@ -81,6 +84,7 @@ Route::group(['prefix'=>'panel','namespace'=>'Admin'],function(){
             Route::post('/abonar',['uses'=>'ApartadoController@ctrAbonarApartado','as'=>'darAbono']);
             
             
+            Route::get('/ordenes',['uses'=>'ApartadoController@VerOrdenes','as'=>'VerOrden']);
            
             // Route::post('/apartados',['uses'=>'ApartadoController@apartar','as'=>'apartar']);
         });
@@ -88,7 +92,7 @@ Route::group(['prefix'=>'panel','namespace'=>'Admin'],function(){
 });
 
 
-Route::get('/ingresar','Admin\clienteController@index');
+Route::get('/ingresar',['uses'=>'Admin\clienteController@index','as'=>'ingresar']);
 
 Route::post('ingresar','Admin\clienteController@login');
 
@@ -112,11 +116,8 @@ Route::post('ajax/editar-producto','Admin\productoController@ajaxEditarProducto'
 Route::post('ajax/borrar-producto','Admin\productoController@ctrBorrarProducto');
 Route::post('ajax/codigo-productos','Admin\productoController@ajaxValidarCodigo');
 
-
-
 Route::get('ajax/print-ticket/{codigo}','Admin\VentaController@print_ticket');
 Route::get('ajax/imprimir-factura/{codigo}','Admin\VentaController@imprimir_factura');
-
 
 Route::post('ajax/dataTable-inventario','Admin\InventarioController@mostrarTablaInventario');
 
@@ -140,30 +141,64 @@ Route::post('ajax/nombre-categorias','Admin\categoriasController@ajaxValidarCate
 Route::post('ajax/editar-categoria','Admin\categoriasController@ajaxEditarCategoria');
 Route::post('ajax/borrar-categoria','Admin\categoriasController@ctrEliminarCategoria');
 
+Route::post('ajax/dataTable-ordenes-online','Admin\VentaController@mostrarTablaOrdenes');
+Route::post('ajax/activar_ordenes','Admin\VentaController@activar_orden');
+
+Route::post('ajax/eliminar_orden','Admin\VentaController@eliminar_orden');
+
+
 
 Route::post('ajax/fechas','vistaController@Rango_fechas');
 Route::get('ajax/apartar','Admin\ApartadoController@apartar');
 Route::post('ajax/borrar-apartado','Admin\ApartadoController@ctrEliminarApartado');
 Route::post('ajax/liquidar-apartado','Admin\ApartadoController@liquidar');
-Route::post('ajax/Rango_fechas','Admin\MoviminetosController@movimientos_rango');
-
+Route::post('ajax/Rango_fechas','Admin\MovimientosController@productos_rangofecha');
+Route::post('ajax/Rango_fechas_grafico','Admin\VentaController@ventas_rangofecha_grafico');
 
 
 Route::post('ajax/inventario','Admin\InventarioController@ajaxEditarProducto');
 
-
-
 Route::get('ajax/dataTable-apartados','Admin\ApartadoController@mostrarTablaApartados');
-
 
 ///ajax tablas
 Route::get('listarProductos/inventario/{page?}','Admin\inventarioController@listainventario');
 
+Route::get('ajax/producto_precio','HomeController@productos_precio');
+Route::get('ajax/producto_category','HomeController@productos_category');
+Route::get('ajax/producto_buscar','HomeController@buscador');
+Route::get('ajax/producto_filtrado','HomeController@productos_filtrado');
+
+Route::get('ajax/producto_category_index','HomeController@productos_filtrado_index');
+
+// Route::post('ajax/editar-producto-carrito','cartController@editar_producto_carrito');
+
+
+Route::post('ajax/borrar-producto-carrito','cartController@borrarCartProduct');
+Route::post('ajax/producto/cantidad-exitencia','Admin\productoController@existenciaProducto');
+
+Route::post('ajax/borrar-producto-carrito-especifico','cartController@borrar_producto_carrito');
+
+Route::post('/solicitar-contraseña','Admin\clienteController@solicitar_contraseña');
 
 
 ////
+Route::post('/cart/edit/{id}','cartController@editar_producto_carrito');
+
+Route::post('/cliente/editar',['uses'=>'Admin\clienteController@editar_cliente_info','as'=>'EditarPerfil']);
+Route::get('/cliente/compras/{id}',['uses'=>'Admin\clienteController@compras_cliente','as'=>'ComprasCliente']);
+
+
+Route::get('/asignar/contraseña',['uses'=>'Admin\clienteController@asignar_contraseña','as'=>'ContraseñaCliente']);
+
+Route::get('/pedir/contraseña',['uses'=>'Auth\ForgotPasswordController@showLinkRequestForm','as'=>'ContraseñaClienteReset']);
+
+
+Route::post('/paypal/pay/{id}','PaymentController@PagoPaypal');
+Route::post('/pago','PaymentController@PagoStripe');
+// Route::post('/carrito','PaymentController@PagoPaypal');
 //paginacion
-Route::get('/', 'vistaController@index');
+Route::get('/', ['uses'=>'vistaController@index','as'=>'inicio']);
+Route::get('/pagos', ['uses'=>'vistaController@pagos','as'=>'pagos']);
 
 // Route::get('/cliente', 'clienteController@index');
 
@@ -172,12 +207,29 @@ Route::get('/', 'vistaController@index');
 Route::get('/producto/{id}/detalle','HomeController@informacion_producto');
 
 Route::get('/producto-categoria/{id}','HomeController@productoCategoria');
+Route::get('/carrito','cartController@showCart');
+Route::get('/carrito/edit/{id}','cartController@editar_producto_carrito');
 
-Route::get('/nosotros','HomeController@nosotros');
+Route::post('/borrar-producto-carrito',['uses'=>'cartController@borrar_producto_carrito','as'=>'BorrarEnCart']);
+Route::post('/editar-carrito',['uses'=>'cartController@editar_carrito_producto_especifico','as'=>'EditEnCart']);
 
-Route::get('/contactanos','HomeController@contacto');
 
-Route::get('/productos','HomeController@productos');
+
+Route::get('/productos',['uses'=>'HomeController@productos','as'=>'productoHome']);
+
+Route::get('/nosotros',['uses'=>'HomeController@nosotros','as'=>'nosotros']);
+
+Route::get('/contactanos',['uses'=>'HomeController@contacto','as'=>'contactanos']);
+
+Route::post('/producto/agregar-producto-carrito','cartController@carritoAdd');
+
+Route::group(['middleware' => ['cliente.user']
+], function()
+{
+    
+    Route::get('/perfil',['uses'=>'vistaController@perfilCliente','as'=>'perfil']);
+    // Route::post('/perfil/edit/{id}','Admin\clienteController@editar_cliente_info');
+});
 
 
 
